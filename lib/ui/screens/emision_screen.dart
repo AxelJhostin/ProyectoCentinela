@@ -212,10 +212,11 @@ class _EmisionScreenState extends State<EmisionScreen> {
               controller: _ultimaVistaController,
               enabled: !_enviando,
               decoration: const InputDecoration(
-                labelText: 'Descripción del lugar',
-                hintText: 'Ej: Universidad, frente al parque central',
+                labelText: 'Descripción del lugar (texto libre)',
+                hintText: 'Ej: Se la vio saliendo del mercado, iba hacia el norte',
               ),
               textCapitalization: TextCapitalization.sentences,
+              maxLines: 2,
             ),
             const SizedBox(height: CentinelaSpacing.md),
             UbicacionPinPicker(
