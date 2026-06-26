@@ -8,6 +8,7 @@ import '../../services/alerta_service.dart';
 import '../../services/avistamiento_service.dart';
 import '../../services/geocoding_service.dart';
 import '../../services/moderacion_service.dart';
+import '../../services/push_service.dart';
 import '../../services/share_service.dart';
 import '../theme/centinela_spacing.dart';
 import '../theme/centinela_theme.dart';
@@ -61,6 +62,13 @@ class _DetalleAlertaScreenState extends State<DetalleAlertaScreen> {
     setState(() => _resolviendo = true);
     try {
       await AlertaService.resolverAlerta(widget.alerta.id);
+      await PushService.notificarComunidadResuelto(
+        alertaId: widget.alerta.id,
+        lat: widget.alerta.latitud,
+        lng: widget.alerta.longitud,
+        radioKm: widget.alerta.radioKm,
+        nombrePersona: widget.alerta.nombrePersona,
+      );
       if (!mounted) return;
       Navigator.of(context).pop();
     } catch (e) {
@@ -89,7 +97,11 @@ class _DetalleAlertaScreenState extends State<DetalleAlertaScreen> {
   Future<void> _reportarLoVi() async {
     final ok = await Navigator.of(context).push<bool>(
       MaterialPageRoute<bool>(
-        builder: (_) => ConfirmarAvistamientoScreen(alertaId: widget.alerta.id),
+        builder: (_) => ConfirmarAvistamientoScreen(
+          alertaId: widget.alerta.id,
+          alertaLat: widget.alerta.latitud,
+          alertaLng: widget.alerta.longitud,
+        ),
       ),
     );
     if (ok == true && mounted) {

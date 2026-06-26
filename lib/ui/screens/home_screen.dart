@@ -8,6 +8,8 @@ import '../../models/alerta_desaparecido.dart';
 import '../../services/alerta_service.dart';
 import '../../services/avistamiento_service.dart';
 import '../../services/location_service.dart';
+import '../../services/share_service.dart';
+import '../../services/witness_guide_service.dart';
 import '../theme/centinela_theme.dart';
 import '../widgets/alerta_card.dart';
 import '../widgets/emitir_alerta_fab.dart';
@@ -96,6 +98,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
       _subscribeRealtime(centro);
       await _watchMisAvistamientos();
+      if (mounted) await WitnessGuideService.showIfNeeded(context);
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -185,11 +188,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         userAgentPackageName:
                             'com.axeljhostin.centinela.centinela',
                       ),
-                      // Los marcadores no se tocan en Home; evita bloquear pan/zoom del mapa.
+                      MarkerLayer(
+                        markers: _alertas.map(_markerForAlerta).toList(),
+                      ),
                       IgnorePointer(
                         child: MarkerLayer(
                           markers: [
-                            ..._alertas.map(_markerForAlerta),
                             Marker(
                               point: centro,
                               width: 48,
@@ -353,6 +357,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     return AlertaCard(
                       alerta: alerta,
                       onTap: () => _openDetalle(alerta),
+                      onShare: () => _compartirWhatsApp(alerta),
                     );
                   },
                 ),
@@ -364,14 +369,27 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Marker _markerForAlerta(AlertaDesaparecido alerta) {
     return Marker(
       point: LatLng(alerta.latitud, alerta.longitud),
-      width: 36,
-      height: 36,
-      child: const Icon(
-        Icons.location_on,
-        color: CentinelaColors.alertCritical,
-        size: 36,
+      width: 40,
+      height: 40,
+      child: GestureDetector(
+        onTap: () => _openDetalle(alerta),
+        child: const Icon(
+          Icons.location_on,
+          color: CentinelaColors.alertCritical,
+          size: 40,
+        ),
       ),
     );
+  }
+
+  Future<void> _compartirWhatsApp(AlertaDesaparecido alerta) async {
+    final ok = await ShareService.compartirWhatsApp(alerta);
+    if (!mounted) return;
+    if (!ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No se pudo abrir WhatsApp')),
+      );
+    }
   }
 
   void _openDetalle(AlertaDesaparecido alerta) {

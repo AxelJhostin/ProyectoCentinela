@@ -3,10 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../models/push_dispatch_result.dart';
 import '../../services/alerta_service.dart';
 import '../../services/foto_service.dart';
 import '../../services/location_service.dart';
 import '../../services/push_service.dart';
+import '../../services/share_service.dart';
 import '../../utils/user_facing_error.dart';
 import '../theme/centinela_spacing.dart';
 import '../theme/centinela_theme.dart';
@@ -29,7 +31,10 @@ class _EmisionScreenState extends State<EmisionScreen> {
 
   Uint8List? _fotoBytes;
   LatLng? _ubicacionPin;
+  int _radioKm = 10;
   bool _enviando = false;
+
+  static const _radiosDisponibles = [10, 30, 50];
 
   @override
   void initState() {
@@ -90,6 +95,54 @@ class _EmisionScreenState extends State<EmisionScreen> {
     );
   }
 
+  Future<void> _mostrarResultadoEmision({
+    required String alertaId,
+    required PushDispatchResult push,
+    required int radioKm,
+  }) async {
+    final alerta = await AlertaService.fetchById(alertaId);
+    if (!mounted) return;
+
+    final sent = push.sent;
+    final ok = push.ok;
+
+    String mensaje;
+    if (!ok) {
+      mensaje =
+          'Alerta publicada, pero no pudimos confirmar las notificaciones push. '
+          'Comparte por WhatsApp para llegar a más gente.';
+    } else if (sent > 0) {
+      mensaje =
+          'Se notificó a $sent ${sent == 1 ? 'persona' : 'personas'} '
+          'en un radio de $radioKm km.';
+    } else {
+      mensaje =
+          'Nadie con la app activa está cerca ($radioKm km). '
+          'Comparte por WhatsApp para amplificar la alerta.';
+    }
+
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Alerta enviada'),
+        content: Text(mensaje),
+        actions: [
+          if (alerta != null && (sent == 0 || !ok))
+            TextButton(
+              onPressed: () async {
+                await ShareService.compartirWhatsApp(alerta);
+              },
+              child: const Text('Difundir en WhatsApp'),
+            ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Entendido'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _enviar() async {
     if (_fotoBytes == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -111,31 +164,35 @@ class _EmisionScreenState extends State<EmisionScreen> {
     try {
       final fotoUrl = await FotoService.uploadAlertaFoto(_fotoBytes!);
       final nombre = _nombreController.text.trim();
+      final edad = int.parse(_edadController.text);
+      final ultimaVista = _ultimaVistaController.text.trim();
       final alertaId = await AlertaService.crearAlerta(
         nombrePersona: nombre,
-        edadAprox: int.parse(_edadController.text),
+        edadAprox: edad,
         vestimenta: _vestimentaController.text.trim(),
         fotoUrl: fotoUrl,
         lat: _ubicacionPin!.latitude,
         lng: _ubicacionPin!.longitude,
-        ultimaVistaTexto: _ultimaVistaController.text.trim(),
-        radioKm: 10,
+        ultimaVistaTexto: ultimaVista,
+        radioKm: _radioKm,
       );
-      await PushService.notificarUsuariosCercanos(
+      final push = await PushService.notificarUsuariosCercanos(
         alertaId: alertaId,
         lat: _ubicacionPin!.latitude,
         lng: _ubicacionPin!.longitude,
         nombrePersona: nombre,
-        radioKm: 10,
+        radioKm: _radioKm,
+        edadAprox: edad,
+        ultimaVistaTexto: ultimaVista,
       );
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Alerta enviada a la comunidad'),
-          backgroundColor: CentinelaColors.alertCritical,
-        ),
+      await _mostrarResultadoEmision(
+        alertaId: alertaId,
+        push: push,
+        radioKm: _radioKm,
       );
+      if (!mounted) return;
       Navigator.of(context).pop();
     } catch (e) {
       if (!mounted) return;
@@ -226,6 +283,31 @@ class _EmisionScreenState extends State<EmisionScreen> {
               enabled: !_enviando,
               height: 200,
               onChanged: (sel) => setState(() => _ubicacionPin = sel.point),
+            ),
+            const SizedBox(height: CentinelaSpacing.lg),
+            Text(
+              'Radio de notificación',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: CentinelaSpacing.sm),
+            SegmentedButton<int>(
+              segments: _radiosDisponibles
+                  .map((km) => ButtonSegment(value: km, label: Text('$km km')))
+                  .toList(),
+              selected: {_radioKm},
+              onSelectionChanged: _enviando
+                  ? null
+                  : (sel) => setState(() => _radioKm = sel.first),
+            ),
+            const SizedBox(height: CentinelaSpacing.sm),
+            Text(
+              'Jipijapa urbano: 10 km. Rural o carretera: 30 km. '
+              'Provincia (máx. app): 50 km. Para más alcance, usa WhatsApp.',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: CentinelaColors.textSecondary,
+              ),
             ),
             const SizedBox(height: 100),
           ],

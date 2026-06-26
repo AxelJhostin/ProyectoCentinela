@@ -84,7 +84,7 @@ class AlertaService {
     required String fotoUrl,
     required double lat,
     required double lng,
-    int radioKm = 5,
+    int radioKm = 10,
     String? ultimaVistaTexto,
   }) async {
     final id = await _client.rpc<dynamic>(

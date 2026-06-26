@@ -6,10 +6,16 @@ import '../theme/centinela_theme.dart';
 
 /// Tarjeta de alerta en el bottom sheet del Home.
 class AlertaCard extends StatelessWidget {
-  const AlertaCard({super.key, required this.alerta, required this.onTap});
+  const AlertaCard({
+    super.key,
+    required this.alerta,
+    required this.onTap,
+    this.onShare,
+  });
 
   final AlertaDesaparecido alerta;
   final VoidCallback onTap;
+  final VoidCallback? onShare;
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +63,12 @@ class AlertaCard extends StatelessWidget {
                   ],
                 ),
               ),
+              if (onShare != null)
+                IconButton(
+                  icon: const Icon(Icons.share, color: CentinelaColors.whatsApp),
+                  tooltip: 'Compartir WhatsApp',
+                  onPressed: onShare,
+                ),
               const Icon(Icons.chevron_right, color: CentinelaColors.textSecondary),
             ],
           ),

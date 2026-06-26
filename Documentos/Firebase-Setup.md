@@ -6,8 +6,9 @@
 
 1. La app obtiene token FCM → RPC `actualizar_fcm_token`.
 2. Al **emitir alerta**, `PushService` invoca `dispatch-alert-push` → push a usuarios en radio (excluye emisor).
-3. Al pulsar **«Lo vi»**, `PushService` invoca `dispatch-avistamiento-push` → push al emisor.
-4. Tap en notificación abre `DetalleAlertaScreen` vía `alerta_id` en el payload.
+3. Al pulsar **«Lo vi»**, `PushService` invoca `dispatch-avistamiento-push` → push al emisor (lugar, distancia, nota).
+4. Al **marcar resuelto**, `PushService` invoca `dispatch-resuelto-push` → push a testigos y usuarios en radio.
+5. Tap en notificación abre `DetalleAlertaScreen` vía `alerta_id` en el payload.
 
 ## 1. Proyecto Firebase
 
@@ -47,7 +48,7 @@ Supabase Dashboard → **Project Settings → Edge Functions → Secrets** (proy
 1. Firebase → Cloud Messaging → **Server key** (si aún disponible).
 2. Secret `FCM_SERVER_KEY` = server key.
 
-Las Edge Functions `dispatch-alert-push` y `dispatch-avistamiento-push` usan `_shared/fcm.ts` (v1 primero, legacy como fallback).
+Las Edge Functions `dispatch-alert-push`, `dispatch-avistamiento-push` y `dispatch-resuelto-push` usan `_shared/fcm.ts` (v1 primero, legacy como fallback).
 
 ## 5. Migración y despliegue
 
@@ -58,6 +59,7 @@ supabase db push   # o aplicada vía Dashboard
 # Edge Functions
 supabase functions deploy dispatch-alert-push
 supabase functions deploy dispatch-avistamiento-push
+supabase functions deploy dispatch-resuelto-push
 ```
 
 ## 6. Build APK

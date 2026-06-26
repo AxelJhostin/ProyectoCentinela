@@ -10,9 +10,16 @@ import '../widgets/ubicacion_pin_picker.dart';
 
 /// Confirmar «Lo vi» con pin en mapa (Sprint 5).
 class ConfirmarAvistamientoScreen extends StatefulWidget {
-  const ConfirmarAvistamientoScreen({super.key, required this.alertaId});
+  const ConfirmarAvistamientoScreen({
+    super.key,
+    required this.alertaId,
+    required this.alertaLat,
+    required this.alertaLng,
+  });
 
   final String alertaId;
+  final double alertaLat;
+  final double alertaLng;
 
   @override
   State<ConfirmarAvistamientoScreen> createState() =>
@@ -51,7 +58,19 @@ class _ConfirmarAvistamientoScreenState extends State<ConfirmarAvistamientoScree
             : _notaController.text.trim(),
         ubicacionTexto: _etiquetaLugar,
       );
-      await PushService.notificarEmisorAvistamiento(widget.alertaId);
+      final distanciaKm = const Distance().as(
+        LengthUnit.Kilometer,
+        LatLng(widget.alertaLat, widget.alertaLng),
+        _ubicacion!,
+      );
+      await PushService.notificarEmisorAvistamiento(
+        alertaId: widget.alertaId,
+        ubicacionTexto: _etiquetaLugar,
+        distanciaKm: distanciaKm,
+        notaPreview: _notaController.text.trim().isEmpty
+            ? null
+            : _notaController.text.trim(),
+      );
       if (!mounted) return;
       Navigator.of(context).pop(true);
     } catch (e) {

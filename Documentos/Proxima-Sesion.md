@@ -4,22 +4,27 @@
 
 | Sprint | Estado |
 |--------|--------|
-| 5.1 | ✅ Fixes piloto (WhatsApp, mapa, Lo vi) |
-| 5.2 | ✅ Firebase + secret Supabase configurados — **listo para probar push** |
+| 5.1–5.3 | ✅ Piloto Beta (push, avistamientos, mapa) |
+| 6 | ✅ Código + **Edge Functions desplegadas** en Supabase |
 
-## Probar ahora (piloto Beta push)
+## Desplegado en Supabase (26 jun 2026)
 
-1. APK: `build/app/outputs/flutter-apk/app-release.apk` (~53 MB)
-2. Instalar en 2+ Android (Play Protect → Instalar de todas formas si aplica)
-3. Login + permisos notificaciones y GPS
-4. Verificar `usuarios.fcm_token` en Supabase
-5. Escenarios:
-   - A emite alerta → B recibe push (≤5 km)
-   - B «Lo vi» → A (emisor) recibe push
+- `dispatch-alert-push` v5 — push enriquecido (edad, lugar, radio)
+- `dispatch-avistamiento-push` v3 — lugar, distancia, nota
+- `dispatch-resuelto-push` v2 — **nueva** — aviso al resolver
 
-Checklists: [Sprint-5-Backlog-Fixes-Piloto.md](Sprint-5-Backlog-Fixes-Piloto.md) · [Sprint-5.2-Firebase-FCM.md](Sprint-5.2-Firebase-FCM.md)
+## Probar ahora
 
-## Después del piloto Beta
+1. `./scripts/build_apk.sh`
+2. Instalar APK en 2+ Android con GPS y notificaciones
+3. Escenarios [Sprint-6-Backlog.md](Sprint-6-Backlog.md):
+   - Emitir con radio 10 km → ver «Se notificó a N personas»
+   - Emitir lejos de otros usuarios → botón WhatsApp
+   - «Lo vi» con nota → push al emisor con lugar
+   - Marcar resuelto → push «Caso resuelto» a testigos
+   - Guía testigo (primera vez) + pin tocable + share en Home
 
-- Recoger feedback (push llegó / no llegó, batería, UX)
-- Rotar service account si la clave se expuso en algún canal inseguro
+## Después
+
+- Play Store / firma release (cuando decidas escalar)
+- iOS + APNs (secundario)

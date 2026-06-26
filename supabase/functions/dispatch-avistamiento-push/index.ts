@@ -4,6 +4,9 @@ import { sendFcm } from "../_shared/fcm.ts";
 
 interface Body {
   alerta_id: string;
+  ubicacion_texto?: string;
+  distancia_km?: number;
+  nota_preview?: string;
 }
 
 Deno.serve(async (req: Request) => {
@@ -15,7 +18,8 @@ Deno.serve(async (req: Request) => {
     return json({ ok: false, message: "FCM no configurado en Supabase Secrets" });
   }
 
-  const { alerta_id } = (await req.json()) as Body;
+  const body = (await req.json()) as Body;
+  const { alerta_id } = body;
 
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
@@ -43,15 +47,38 @@ Deno.serve(async (req: Request) => {
     return json({ ok: false, sent: 0, message: "Emisor sin token FCM" });
   }
 
+  const lugar = body.ubicacion_texto?.trim();
+  const dist = body.distancia_km != null
+    ? `${body.distancia_km.toFixed(1)} km de tu reporte`
+    : null;
+  const nota = body.nota_preview?.trim();
+
+  let detalle = "Alguien reportó haberlo visto.";
+  if (lugar && dist) {
+    detalle = `Visto cerca de ${truncate(lugar, 50)} (${dist}).`;
+  } else if (lugar) {
+    detalle = `Visto cerca de ${truncate(lugar, 60)}.`;
+  } else if (dist) {
+    detalle = `Avistamiento a ${dist}.`;
+  }
+  if (nota) {
+    detalle += ` Nota: ${truncate(nota, 80)}`;
+  }
+
   const ok = await sendFcm(
     token,
     "👁 Nuevo avistamiento",
-    `Alguien reportó haber visto a ${alerta.nombre_persona}.`,
+    `${detalle} ${alerta.nombre_persona}.`,
     { alerta_id, tipo: "avistamiento" },
   );
 
   return json({ ok, sent: ok ? 1 : 0 });
 });
+
+function truncate(text: string, max: number): string {
+  if (text.length <= max) return text;
+  return `${text.slice(0, max - 1)}…`;
+}
 
 function json(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {

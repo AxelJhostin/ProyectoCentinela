@@ -19,6 +19,7 @@ Plataforma móvil de alertas comunitarias hiperlocales para reportes de personas
 | [Piloto Jipijapa](Documentos/Sprint-4-Checklist-Piloto.md) | Checklist y métricas Sprint 4 |
 | [**Sprint 5 — Fixes piloto**](Documentos/Sprint-5-Backlog-Fixes-Piloto.md) | Correcciones post-prueba Alfa |
 | [**Sprint 5.2 — Firebase FCM**](Documentos/Sprint-5.2-Firebase-FCM.md) | Push comunitario y al emisor |
+| [**Sprint 6 — Cierre de ciclo**](Documentos/Sprint-6-Backlog.md) | Feedback emisor, radio configurable, UX testigo |
 | [Próxima sesión](Documentos/Proxima-Sesion.md) | Estado actual y qué hacer |
 
 ## Diseño
@@ -31,7 +32,7 @@ Plataforma móvil de alertas comunitarias hiperlocales para reportes de personas
 |------|------------|
 | App móvil | Flutter 3.x (Android piloto; Web para pruebas; iOS secundario) |
 | Backend / BD | Supabase `centinela-mvp` (PostgreSQL + PostGIS) |
-| Push | Firebase Cloud Messaging + Edge Functions `dispatch-alert-push`, `dispatch-avistamiento-push` |
+| Push | Firebase Cloud Messaging + Edge Functions `dispatch-alert-push`, `dispatch-avistamiento-push`, `dispatch-resuelto-push` |
 | Deep links / OG | `centinela://alerta` + Edge Function `alerta-preview` |
 
 ## Estado del proyecto
@@ -46,7 +47,17 @@ Plataforma móvil de alertas comunitarias hiperlocales para reportes de personas
 | Sprint 2 — backend en app | ✅ |
 | Sprint 3 — geofencing y amplificación | ✅ |
 | Sprint 4 — legal, QA, piloto | ✅ Prueba Alfa realizada |
-| Sprint 5 — fixes piloto | ✅ 5.1 WhatsApp/mapa/Lo vi · ✅ 5.2 Firebase FCM listo para prueba |
+| Sprint 5 — fixes piloto | ✅ 5.1–5.3 · ✅ 5.2 FCM |
+| Sprint 6 — cierre de ciclo | ✅ Feedback, radio, push enriquecidos, UX testigo |
+
+## Sprint 6 — entregables
+
+- **Feedback al emitir:** «Se notificó a N personas» o sugerencia WhatsApp
+- **Radio configurable:** 10 / 30 / 50 km en emisión (default 10, máx. BD 50)
+- **Push enriquecidos:** alerta nueva, «Lo vi» y caso resuelto
+- **Guía testigo** única al entrar a Home
+- **Mapa Home:** pines de alerta tocables
+- **WhatsApp** desde tarjetas del panel inferior
 
 ## Sprint 5 — entregables (post-prueba Alfa)
 
