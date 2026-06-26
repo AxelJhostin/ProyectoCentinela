@@ -42,10 +42,27 @@ El esquema SQL inicial está en `supabase/migrations/`.
 | Requerimientos | Documentado |
 | Arquitectura / SDD | Documentado |
 | Diseño UI (Figma) | 3 pantallas core + design system |
-| Implementación | Pendiente (Sprint 0) |
+| Git local | Commit inicial hecho |
+| GitHub remoto | **Pendiente** — ver abajo |
+| Implementación Flutter | Pendiente (Sprint 0) |
 | Supabase | Sin crear aún |
 
-## Próximo paso
+## GitHub (siguiente paso tuyo, ~5 min)
+
+Instalamos `gh` en tu Mac. Falta **vincular tu cuenta** y crear el repo:
+
+```bash
+# 1. Iniciar sesión (solo una vez; sigue el asistente en la terminal)
+gh auth login
+
+# 2. Crear repo privado y subir el código
+cd /Users/hernandezaxel/proyectos/ProyectoEmilia
+./scripts/setup-github.sh
+```
+
+Guía detallada con alternativa manual: [Documentos/Sprint-0-Guia-Paso-a-Paso.md](Documentos/Sprint-0-Guia-Paso-a-Paso.md)
+
+## Próximo paso técnico
 
 **Sprint 0:** crear repo Flutter, proyecto Supabase `centinela-mvp`, ejecutar migración SQL, conectar SDK.
 
