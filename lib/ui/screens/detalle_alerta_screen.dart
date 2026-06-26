@@ -1,14 +1,17 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../../models/alerta_desaparecido.dart';
 import '../../services/alerta_service.dart';
 import '../../services/avistamiento_service.dart';
+import '../../services/geocoding_service.dart';
 import '../../services/moderacion_service.dart';
 import '../../services/share_service.dart';
 import '../theme/centinela_spacing.dart';
 import '../theme/centinela_theme.dart';
+import '../widgets/avistamiento_mapa_dialog.dart';
 import '../widgets/centinela_action_button.dart';
 import 'confirmar_avistamiento_screen.dart';
 
@@ -196,7 +199,11 @@ class _DetalleAlertaScreenState extends State<DetalleAlertaScreen> {
                   ),
                 ],
                 const SizedBox(height: CentinelaSpacing.lg),
-                if (esEmisor) _AvistamientosEmisorCard(alertaId: alerta.id),
+                if (esEmisor)
+                  _AvistamientosEmisorCard(
+                    alertaId: alerta.id,
+                    origenAlerta: LatLng(alerta.latitud, alerta.longitud),
+                  ),
                 if (esEmisor) const SizedBox(height: CentinelaSpacing.lg),
                 if (alerta.vestimenta.isNotEmpty)
                   Container(
@@ -265,9 +272,13 @@ class _DetalleAlertaScreenState extends State<DetalleAlertaScreen> {
 }
 
 class _AvistamientosEmisorCard extends StatefulWidget {
-  const _AvistamientosEmisorCard({required this.alertaId});
+  const _AvistamientosEmisorCard({
+    required this.alertaId,
+    required this.origenAlerta,
+  });
 
   final String alertaId;
+  final LatLng origenAlerta;
 
   @override
   State<_AvistamientosEmisorCard> createState() => _AvistamientosEmisorCardState();
@@ -296,7 +307,18 @@ class _AvistamientosEmisorCardState extends State<_AvistamientosEmisorCard> {
   Future<void> _loadResumen() async {
     try {
       final items = await AvistamientoService.resumen(widget.alertaId);
-      if (mounted) setState(() => _resumen = items);
+      final enriched = <AvistamientoResumen>[];
+      for (final item in items) {
+        if (item.ubicacionTexto != null && item.ubicacionTexto!.isNotEmpty) {
+          enriched.add(item);
+          continue;
+        }
+        final label = await GeocodingService.reverseLabel(
+          LatLng(item.lat, item.lng),
+        );
+        enriched.add(item.copyWith(lugarResuelto: label));
+      }
+      if (mounted) setState(() => _resumen = enriched);
     } catch (_) {}
   }
 
@@ -331,16 +353,83 @@ class _AvistamientosEmisorCardState extends State<_AvistamientosEmisorCard> {
           ),
           if (_resumen.isNotEmpty) ...[
             const SizedBox(height: 12),
-            ..._resumen.map(
-              (r) => Padding(
-                padding: const EdgeInsets.only(top: 4),
+            ..._resumen.map((r) => _AvistamientoResumenTile(
+                  resumen: r,
+                  origenAlerta: widget.origenAlerta,
+                )),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _AvistamientoResumenTile extends StatelessWidget {
+  const _AvistamientoResumenTile({
+    required this.resumen,
+    required this.origenAlerta,
+  });
+
+  final AvistamientoResumen resumen;
+  final LatLng origenAlerta;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.all(CentinelaSpacing.sm),
+      decoration: BoxDecoration(
+        color: CentinelaColors.surface.withValues(alpha: 0.85),
+        borderRadius: BorderRadius.circular(CentinelaSpacing.radiusMd),
+        border: Border.all(color: CentinelaColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.place_outlined, size: 18, color: CentinelaColors.community),
+              const SizedBox(width: 8),
+              Expanded(
                 child: Text(
-                  '• ${r.texto}',
-                  style: Theme.of(context).textTheme.bodySmall,
+                  resumen.lugarDisplay,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '${resumen.distanciaKm.toStringAsFixed(1)} km de tu punto reportado · ${resumen.tiempoTexto}',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: CentinelaColors.textSecondary,
+            ),
+          ),
+          if (resumen.notaTestigo != null && resumen.notaTestigo!.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Text(
+              '«${resumen.notaTestigo}»',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                fontStyle: FontStyle.italic,
               ),
             ),
           ],
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: () => AvistamientoMapaDialog.show(
+                context,
+                origenAlerta: origenAlerta,
+                puntoAvistamiento: LatLng(resumen.lat, resumen.lng),
+                titulo: 'Mapa del avistamiento',
+              ),
+              icon: const Icon(Icons.map_outlined, size: 18),
+              label: const Text('Ver en mapa'),
+            ),
+          ),
         ],
       ),
     );

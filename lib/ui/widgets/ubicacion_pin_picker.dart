@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../models/ubicacion_seleccion.dart';
 import '../../services/geocoding_service.dart';
 import '../../services/location_service.dart';
 import '../theme/centinela_spacing.dart';
@@ -19,7 +20,7 @@ class UbicacionPinPicker extends StatefulWidget {
   });
 
   final LatLng? position;
-  final ValueChanged<LatLng> onChanged;
+  final ValueChanged<UbicacionSeleccion> onChanged;
   final double height;
   final bool enabled;
   final bool showSearch;
@@ -32,9 +33,9 @@ class _UbicacionPinPickerState extends State<UbicacionPinPicker> {
   final _mapController = MapController();
   final _searchController = TextEditingController();
   LatLng? _pin;
+  String? _resolvedPlaceName;
   bool _loadingGps = false;
   bool _searching = false;
-  String? _resolvedPlaceName;
 
   static const _defaultCenter = GeocodingService.jipijapaCenter;
 
@@ -62,6 +63,12 @@ class _UbicacionPinPickerState extends State<UbicacionPinPicker> {
     super.dispose();
   }
 
+  void _notify(LatLng point, {String? placeName}) {
+    widget.onChanged(
+      UbicacionSeleccion(point: point, etiquetaLugar: placeName),
+    );
+  }
+
   Future<void> _loadGps() async {
     setState(() => _loadingGps = true);
     final pos = await LocationService.getCurrentPosition();
@@ -73,7 +80,7 @@ class _UbicacionPinPickerState extends State<UbicacionPinPicker> {
         _loadingGps = false;
         _resolvedPlaceName = 'Tu ubicación actual';
       });
-      widget.onChanged(latLng);
+      _notify(latLng, placeName: _resolvedPlaceName);
       _moveMapTo(latLng, zoom: 16);
     } else {
       setState(() => _loadingGps = false);
@@ -92,7 +99,7 @@ class _UbicacionPinPickerState extends State<UbicacionPinPicker> {
       _pin = point;
       _resolvedPlaceName = placeName;
     });
-    widget.onChanged(point);
+    _notify(point, placeName: placeName);
     _moveMapTo(point, zoom: 16);
   }
 

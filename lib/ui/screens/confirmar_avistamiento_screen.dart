@@ -21,7 +21,15 @@ class ConfirmarAvistamientoScreen extends StatefulWidget {
 
 class _ConfirmarAvistamientoScreenState extends State<ConfirmarAvistamientoScreen> {
   LatLng? _ubicacion;
+  String? _etiquetaLugar;
+  final _notaController = TextEditingController();
   bool _enviando = false;
+
+  @override
+  void dispose() {
+    _notaController.dispose();
+    super.dispose();
+  }
 
   Future<void> _confirmar() async {
     if (_ubicacion == null) {
@@ -38,6 +46,10 @@ class _ConfirmarAvistamientoScreenState extends State<ConfirmarAvistamientoScree
         widget.alertaId,
         lat: _ubicacion!.latitude,
         lng: _ubicacion!.longitude,
+        notaTestigo: _notaController.text.trim().isEmpty
+            ? null
+            : _notaController.text.trim(),
+        ubicacionTexto: _etiquetaLugar,
       );
       await PushService.notificarEmisorAvistamiento(widget.alertaId);
       if (!mounted) return;
@@ -68,7 +80,21 @@ class _ConfirmarAvistamientoScreenState extends State<ConfirmarAvistamientoScree
             position: _ubicacion,
             enabled: !_enviando,
             height: 280,
-            onChanged: (p) => setState(() => _ubicacion = p),
+            onChanged: (sel) => setState(() {
+              _ubicacion = sel.point;
+              _etiquetaLugar = sel.etiquetaLugar;
+            }),
+          ),
+          const SizedBox(height: CentinelaSpacing.md),
+          TextField(
+            controller: _notaController,
+            enabled: !_enviando,
+            maxLines: 2,
+            textCapitalization: TextCapitalization.sentences,
+            decoration: const InputDecoration(
+              labelText: 'Detalle (opcional)',
+              hintText: 'Ej: Iba caminando hacia el mercado, llevaba mochila azul',
+            ),
           ),
           const SizedBox(height: CentinelaSpacing.lg),
           FilledButton(

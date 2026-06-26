@@ -119,12 +119,14 @@ class _EmisionScreenState extends State<EmisionScreen> {
         lat: _ubicacionPin!.latitude,
         lng: _ubicacionPin!.longitude,
         ultimaVistaTexto: _ultimaVistaController.text.trim(),
+        radioKm: 10,
       );
       await PushService.notificarUsuariosCercanos(
         alertaId: alertaId,
         lat: _ubicacionPin!.latitude,
         lng: _ubicacionPin!.longitude,
         nombrePersona: nombre,
+        radioKm: 10,
       );
 
       if (!mounted) return;
@@ -223,7 +225,7 @@ class _EmisionScreenState extends State<EmisionScreen> {
               position: _ubicacionPin,
               enabled: !_enviando,
               height: 200,
-              onChanged: (p) => setState(() => _ubicacionPin = p),
+              onChanged: (sel) => setState(() => _ubicacionPin = sel.point),
             ),
             const SizedBox(height: 100),
           ],

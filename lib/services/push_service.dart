@@ -11,7 +11,7 @@ class PushService {
     required double lat,
     required double lng,
     required String nombrePersona,
-    int radioKm = 5,
+    int radioKm = 10,
   }) async {
     try {
       final res = await SupabaseService.client.functions.invoke(

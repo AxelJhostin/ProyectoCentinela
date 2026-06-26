@@ -8,25 +8,66 @@ class AvistamientoResumen {
   const AvistamientoResumen({
     required this.distanciaKm,
     required this.haceMinutos,
+    required this.lat,
+    required this.lng,
+    this.notaTestigo,
+    this.ubicacionTexto,
+    this.lugarResuelto,
   });
 
   final double distanciaKm;
   final int haceMinutos;
+  final double lat;
+  final double lng;
+  final String? notaTestigo;
+  final String? ubicacionTexto;
+  final String? lugarResuelto;
 
   factory AvistamientoResumen.fromMap(Map<String, dynamic> map) {
     return AvistamientoResumen(
       distanciaKm: (map['distancia_km'] as num).toDouble(),
       haceMinutos: map['hace_minutos'] as int,
+      lat: (map['lat'] as num).toDouble(),
+      lng: (map['lng'] as num).toDouble(),
+      notaTestigo: map['nota_testigo'] as String?,
+      ubicacionTexto: map['ubicacion_texto'] as String?,
     );
   }
 
-  String get texto {
-    final tiempo = haceMinutos < 1
-        ? 'hace un momento'
-        : haceMinutos == 1
-            ? 'hace 1 min'
-            : 'hace $haceMinutos min';
-    return 'Avistamiento a ${distanciaKm.toStringAsFixed(1)} km · $tiempo';
+  AvistamientoResumen copyWith({String? lugarResuelto}) {
+    return AvistamientoResumen(
+      distanciaKm: distanciaKm,
+      haceMinutos: haceMinutos,
+      lat: lat,
+      lng: lng,
+      notaTestigo: notaTestigo,
+      ubicacionTexto: ubicacionTexto,
+      lugarResuelto: lugarResuelto,
+    );
+  }
+
+  String get lugarDisplay {
+    if (ubicacionTexto != null && ubicacionTexto!.isNotEmpty) {
+      return _shorten(ubicacionTexto!);
+    }
+    if (lugarResuelto != null && lugarResuelto!.isNotEmpty) {
+      return _shorten(lugarResuelto!);
+    }
+    return 'Lat ${lat.toStringAsFixed(4)}, Lng ${lng.toStringAsFixed(4)}';
+  }
+
+  String get tiempoTexto {
+    if (haceMinutos < 1) return 'hace un momento';
+    if (haceMinutos == 1) return 'hace 1 min';
+    return 'hace $haceMinutos min';
+  }
+
+  String get lineaPrincipal =>
+      'Visto cerca de: $lugarDisplay · ${distanciaKm.toStringAsFixed(1)} km de tu reporte · $tiempoTexto';
+
+  static String _shorten(String text) {
+    if (text.length <= 70) return text;
+    return '${text.substring(0, 67)}…';
   }
 }
 
@@ -36,8 +77,10 @@ class AvistamientoService {
 
   static Future<String> registrarLoVi(
     String alertaId, {
-    double? lat,
-    double? lng,
+    required double lat,
+    required double lng,
+    String? notaTestigo,
+    String? ubicacionTexto,
   }) async {
     final id = await SupabaseService.client.rpc<dynamic>(
       'registrar_avistamiento',
@@ -45,6 +88,8 @@ class AvistamientoService {
         'p_alerta_id': alertaId,
         'p_lat': lat,
         'p_lng': lng,
+        'p_nota_testigo': notaTestigo,
+        'p_ubicacion_texto': ubicacionTexto,
       },
     );
     return id.toString();

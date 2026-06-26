@@ -87,4 +87,38 @@ class GeocodingService {
       );
     }).toList();
   }
+
+  /// Nombre legible de coordenadas (geocodificación inversa).
+  static Future<String?> reverseLabel(LatLng point) async {
+    final uri = Uri.https('nominatim.openstreetmap.org', '/reverse', {
+      'lat': point.latitude.toString(),
+      'lon': point.longitude.toString(),
+      'format': 'json',
+      'zoom': '16',
+      'addressdetails': '1',
+    });
+
+    final res = await http.get(uri, headers: {'User-Agent': _userAgent});
+    if (res.statusCode != 200) return null;
+
+    final data = jsonDecode(res.body) as Map<String, dynamic>;
+    final address = data['address'] as Map<String, dynamic>?;
+    if (address != null) {
+      final parts = <String>[
+        if (address['road'] != null) address['road'] as String,
+        if (address['suburb'] != null) address['suburb'] as String,
+        if (address['city'] != null)
+          address['city'] as String
+        else if (address['town'] != null)
+          address['town'] as String
+        else if (address['village'] != null)
+          address['village'] as String,
+      ].where((p) => p.isNotEmpty).toList();
+      if (parts.isNotEmpty) return parts.take(3).join(', ');
+    }
+
+    final display = data['display_name'] as String?;
+    if (display == null) return null;
+    return display.length > 80 ? '${display.substring(0, 77)}…' : display;
+  }
 }
