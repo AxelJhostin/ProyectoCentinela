@@ -46,7 +46,7 @@ Plataforma móvil de alertas comunitarias hiperlocales para reportes de personas
 | Sprint 2 — backend en app | ✅ |
 | Sprint 3 — geofencing y amplificación | ✅ |
 | Sprint 4 — legal, QA, piloto | ✅ Prueba Alfa realizada |
-| Sprint 5 — fixes piloto | ✅ 5.1 WhatsApp/mapa/Lo vi · ✅ 5.2 Firebase FCM (código) |
+| Sprint 5 — fixes piloto | ✅ 5.1 WhatsApp/mapa/Lo vi · ✅ 5.2 Firebase FCM listo para prueba |
 
 ## Sprint 5 — entregables (post-prueba Alfa)
 
@@ -56,7 +56,7 @@ Plataforma móvil de alertas comunitarias hiperlocales para reportes de personas
 - **Lo vi** con pantalla para marcar dónde
 - **Realtime** avistamientos + resumen para emisor
 - **Firebase FCM (5.2):** tokens, push comunitario, push emisor en «Lo vi», tap abre alerta
-- **Manual:** `google-services.json` + secret `FIREBASE_SERVICE_ACCOUNT` en Supabase → ver [Firebase-Setup.md](Documentos/Firebase-Setup.md)
+- **Firebase configurado:** proyecto `centinela-mvp-ada6e`, `google-services.json` local, secret `FIREBASE_SERVICE_ACCOUNT` en Supabase
 
 ## Sprint 4 — entregables
 
@@ -110,7 +110,29 @@ Guía dispositivos: [Documentos/Ejecutar-App-Dispositivos.md](Documentos/Ejecuta
 ./scripts/build_apk.sh
 ```
 
-APK en `build/app/outputs/flutter-apk/app-release.apk`
+APK generado en:
+
+```
+build/app/outputs/flutter-apk/app-release.apk
+```
+
+Ruta absoluta en este equipo (tras el último build):
+
+```
+/Users/hernandezaxel/proyectos/ProyectoEmilia/build/app/outputs/flutter-apk/app-release.apk
+```
+
+Instalar: copiar a los celulares (Drive/WhatsApp) o `adb install -r build/app/outputs/flutter-apk/app-release.apk`. Play Protect → **Más detalles → Instalar de todas formas** si aplica.
+
+## Probar push (piloto Beta)
+
+1. Instalar el APK en **2+ Android** con el APK de arriba.
+2. Abrir app, iniciar sesión, aceptar **notificaciones** y **ubicación**.
+3. Supabase → `usuarios` → verificar `fcm_token` no nulo.
+4. **A** emite alerta → **B** (≤5 km) recibe push.
+5. **B** confirma «Lo vi» → **A** (emisor) recibe push.
+
+Guía Firebase: [Firebase-Setup.md](Documentos/Firebase-Setup.md)
 
 ## Supabase — Regla crítica
 
@@ -126,8 +148,10 @@ APK en `build/app/outputs/flutter-apk/app-release.apk`
 | 2025-06-27 | Sprint 3 — Lo vi, WhatsApp, deep links, moderación |
 | 2025-06-28 | Sprint 4 — legal LOPDP, avistamientos emisor, build APK |
 | 2025-06-29 | Sprint 5.1 — fixes piloto: WhatsApp, mapa, Lo vi con pin |
+| 2025-06-26 | Sprint 5.2 — Firebase FCM + APK piloto con push |
 
 ## Piloto
 
-- **Alfa:** Jipijapa (Android)
-- **Beta:** Portoviejo (+ iOS opcional)
+- **Alfa:** Jipijapa (Android) — prueba inicial realizada
+- **Beta:** Jipijapa — **prueba push FCM** (2+ dispositivos, APK Sprint 5.2)
+- **Gamma:** Portoviejo (+ iOS opcional)

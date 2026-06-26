@@ -5,23 +5,21 @@
 | Sprint | Estado |
 |--------|--------|
 | 5.1 | ✅ Fixes piloto (WhatsApp, mapa, Lo vi) |
-| 5.2 | ✅ Código FCM en repo · ⏳ Configurar Firebase Console + secret Supabase |
+| 5.2 | ✅ Firebase + secret Supabase configurados — **listo para probar push** |
 
-## Configurar push (una vez)
+## Probar ahora (piloto Beta push)
 
-1. Firebase: proyecto `centinela-mvp`, app Android `com.axeljhostin.centinela.centinela`, descargar `google-services.json` → `android/app/`.
-2. Supabase Secrets: `FIREBASE_SERVICE_ACCOUNT` (JSON service account).
-3. `./scripts/build_apk.sh` e instalar en los 3 Android del piloto.
+1. APK: `build/app/outputs/flutter-apk/app-release.apk` (~53 MB)
+2. Instalar en 2+ Android (Play Protect → Instalar de todas formas si aplica)
+3. Login + permisos notificaciones y GPS
+4. Verificar `usuarios.fcm_token` en Supabase
+5. Escenarios:
+   - A emite alerta → B recibe push (≤5 km)
+   - B «Lo vi» → A (emisor) recibe push
 
-Guía completa: [Firebase-Setup.md](Firebase-Setup.md)
+Checklists: [Sprint-5-Backlog-Fixes-Piloto.md](Sprint-5-Backlog-Fixes-Piloto.md) · [Sprint-5.2-Firebase-FCM.md](Sprint-5.2-Firebase-FCM.md)
 
-## Re-probar en celular
+## Después del piloto Beta
 
-1. Generar nuevo APK: `./scripts/build_apk.sh`
-2. Instalar (Play Protect → Más detalles → Instalar de todas formas)
-3. Checklist: [Sprint-5-Backlog-Fixes-Piloto.md](Sprint-5-Backlog-Fixes-Piloto.md) + [Sprint-5.2-Firebase-FCM.md](Sprint-5.2-Firebase-FCM.md)
-
-## Escenarios push
-
-- Usuario A emite alerta → Usuario B (≤5 km) recibe push con app cerrada.
-- Usuario B confirma «Lo vi» → Usuario A (emisor) recibe push.
+- Recoger feedback (push llegó / no llegó, batería, UX)
+- Rotar service account si la clave se expuso en algún canal inseguro
