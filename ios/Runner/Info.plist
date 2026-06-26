@@ -53,6 +53,17 @@
 	<string>Centinela necesita la cámara para fotos en reportes de emergencia.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Centinela necesita acceder a fotos para reportes de desaparición.</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.axeljhostin.centinela</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>centinela</string>
+			</array>
+		</dict>
+	</array>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

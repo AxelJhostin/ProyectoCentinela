@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../main.dart';
 import '../../services/location_service.dart';
 import '../../services/onboarding_service.dart';
 import '../theme/centinela_spacing.dart';
@@ -37,6 +38,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute<void>(builder: (_) => const HomeScreen()),
     );
+    await initSprint3Services();
   }
 
   @override

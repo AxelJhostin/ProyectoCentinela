@@ -97,4 +97,23 @@ class AlertaService {
   static Future<void> resolverAlerta(String alertaId) async {
     await _client.rpc<void>('resolver_alerta', params: {'p_alerta_id': alertaId});
   }
+
+  /// Una alerta por id (activa o resuelta) para deep links.
+  static Future<AlertaDesaparecido?> fetchById(
+    String alertaId, {
+    double? userLat,
+    double? userLng,
+  }) async {
+    try {
+      final json = await _client.rpc<dynamic>(
+        'obtener_alerta',
+        params: {'p_alerta_id': alertaId},
+      );
+      if (json == null) return null;
+      final map = Map<String, dynamic>.from(json as Map);
+      return AlertaDesaparecido.fromMap(map, userLat: userLat, userLng: userLng);
+    } catch (_) {
+      return null;
+    }
+  }
 }

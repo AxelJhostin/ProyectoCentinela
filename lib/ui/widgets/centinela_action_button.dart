@@ -14,7 +14,7 @@ class CentinelaActionButton extends StatelessWidget {
 
   final String label;
   final Color color;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final IconData? icon;
 
   @override

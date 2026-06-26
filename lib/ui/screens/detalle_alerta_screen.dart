@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../models/alerta_desaparecido.dart';
 import '../../services/alerta_service.dart';
+import '../../services/avistamiento_service.dart';
+import '../../services/location_service.dart';
+import '../../services/moderacion_service.dart';
+import '../../services/share_service.dart';
 import '../theme/centinela_spacing.dart';
 import '../theme/centinela_theme.dart';
 import '../widgets/centinela_action_button.dart';
@@ -19,6 +23,9 @@ class DetalleAlertaScreen extends StatefulWidget {
 class _DetalleAlertaScreenState extends State<DetalleAlertaScreen> {
   bool? _esEmisor;
   bool _resolviendo = false;
+  bool _registrandoLoVi = false;
+  bool _compartiendo = false;
+  bool _reportandoFalsa = false;
 
   @override
   void initState() {
@@ -60,6 +67,80 @@ class _DetalleAlertaScreenState extends State<DetalleAlertaScreen> {
     }
   }
 
+  Future<void> _compartirWhatsApp() async {
+    setState(() => _compartiendo = true);
+    try {
+      final ok = await ShareService.compartirWhatsApp(widget.alerta);
+      if (!mounted) return;
+      if (!ok) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No se pudo abrir WhatsApp')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _compartiendo = false);
+    }
+  }
+
+  Future<void> _reportarLoVi() async {
+    setState(() => _registrandoLoVi = true);
+    try {
+      await LocationService.syncUbicacionToSupabase();
+      await AvistamientoService.registrarLoVi(widget.alerta.id);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Gracias. Tu avistamiento fue registrado.'),
+          backgroundColor: CentinelaColors.community,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _registrandoLoVi = false);
+    }
+  }
+
+  Future<void> _reportarAlertaFalsa() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('¿Reportar alerta falsa?'),
+        content: const Text(
+          'Tu reporte ayuda a proteger a la comunidad. '
+          'Con 3 reportes independientes la alerta se ocultará.',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: FilledButton.styleFrom(backgroundColor: CentinelaColors.alertCritical),
+            child: const Text('Reportar'),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+
+    setState(() => _reportandoFalsa = true);
+    try {
+      await ModeracionService.reportarAlertaFalsa(widget.alerta.id);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Reporte enviado. Gracias por ayudar a la comunidad.')),
+      );
+      Navigator.of(context).pop();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+    } finally {
+      if (mounted) setState(() => _reportandoFalsa = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final alerta = widget.alerta;
@@ -68,7 +149,12 @@ class _DetalleAlertaScreenState extends State<DetalleAlertaScreen> {
     return Scaffold(
       body: Column(
         children: [
-          _PhotoHero(alerta: alerta),
+          _PhotoHero(
+            alerta: alerta,
+            showReport: !esEmisor && _esEmisor != null,
+            reportando: _reportandoFalsa,
+            onReport: _reportarAlertaFalsa,
+          ),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.all(CentinelaSpacing.lg),
@@ -137,14 +223,14 @@ class _DetalleAlertaScreenState extends State<DetalleAlertaScreen> {
                           label: 'Compartir WhatsApp',
                           color: CentinelaColors.whatsApp,
                           icon: Icons.share,
-                          onPressed: () => _mockAction('WhatsApp (Sprint 3)'),
+                          onPressed: _compartiendo ? null : _compartirWhatsApp,
                         ),
                         const SizedBox(width: 12),
                         CentinelaActionButton(
                           label: '¡Lo Vi!',
                           color: CentinelaColors.community,
                           icon: Icons.my_location,
-                          onPressed: () => _mockAction('Avistamiento (Sprint 3)'),
+                          onPressed: _registrandoLoVi ? null : _reportarLoVi,
                         ),
                       ],
                     ),
@@ -154,18 +240,20 @@ class _DetalleAlertaScreenState extends State<DetalleAlertaScreen> {
       ),
     );
   }
-
-  void _mockAction(String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Próximamente: $feature')),
-    );
-  }
 }
 
 class _PhotoHero extends StatelessWidget {
-  const _PhotoHero({required this.alerta});
+  const _PhotoHero({
+    required this.alerta,
+    this.showReport = false,
+    this.reportando = false,
+    this.onReport,
+  });
 
   final AlertaDesaparecido alerta;
+  final bool showReport;
+  final bool reportando;
+  final VoidCallback? onReport;
 
   @override
   Widget build(BuildContext context) {
@@ -190,10 +278,28 @@ class _PhotoHero extends StatelessWidget {
         SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: IconButton(
-              onPressed: () => Navigator.of(context).pop(),
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              style: IconButton.styleFrom(backgroundColor: Colors.black38),
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  style: IconButton.styleFrom(backgroundColor: Colors.black38),
+                ),
+                const Spacer(),
+                if (showReport)
+                  IconButton(
+                    onPressed: reportando ? null : onReport,
+                    icon: reportando
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          )
+                        : const Icon(Icons.flag_outlined, color: Colors.white),
+                    tooltip: 'Reportar alerta falsa',
+                    style: IconButton.styleFrom(backgroundColor: Colors.black38),
+                  ),
+              ],
             ),
           ),
         ),

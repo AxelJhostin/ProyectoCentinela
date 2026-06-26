@@ -25,4 +25,8 @@ class AppEnv {
     }
     return value;
   }
+
+  /// URL pública para preview WhatsApp (Edge Function alerta-preview).
+  static String alertaPreviewUrl(String alertaId) =>
+      '$supabaseUrl/functions/v1/alerta-preview?id=$alertaId';
 }

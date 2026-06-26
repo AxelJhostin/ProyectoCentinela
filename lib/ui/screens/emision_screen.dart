@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../services/alerta_service.dart';
 import '../../services/foto_service.dart';
 import '../../services/location_service.dart';
+import '../../services/push_service.dart';
 import '../theme/centinela_spacing.dart';
 import '../theme/centinela_theme.dart';
 
@@ -103,13 +104,20 @@ class _EmisionScreenState extends State<EmisionScreen> {
 
     try {
       final fotoUrl = await FotoService.uploadAlertaFoto(_fotoBytes!);
-      await AlertaService.crearAlerta(
-        nombrePersona: _nombreController.text.trim(),
+      final nombre = _nombreController.text.trim();
+      final alertaId = await AlertaService.crearAlerta(
+        nombrePersona: nombre,
         edadAprox: int.parse(_edadController.text),
         vestimenta: _vestimentaController.text.trim(),
         fotoUrl: fotoUrl,
         lat: _ubicacion!.latitude,
         lng: _ubicacion!.longitude,
+      );
+      await PushService.notificarUsuariosCercanos(
+        alertaId: alertaId,
+        lat: _ubicacion!.latitude,
+        lng: _ubicacion!.longitude,
+        nombrePersona: nombre,
       );
 
       if (!mounted) return;

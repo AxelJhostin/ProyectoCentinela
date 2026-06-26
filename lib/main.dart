@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 
 import 'config/app_env.dart';
+import 'services/deep_link_service.dart';
+import 'services/fcm_service.dart';
 import 'services/supabase_service.dart';
 import 'ui/screens/bootstrap_screen.dart';
 import 'ui/theme/centinela_theme.dart';
+
+final navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,8 +24,15 @@ class CentinelaApp extends StatelessWidget {
     return MaterialApp(
       title: 'Centinela',
       debugShowCheckedModeBanner: false,
+      navigatorKey: navigatorKey,
       theme: buildCentinelaTheme(),
       home: const BootstrapScreen(),
     );
   }
+}
+
+/// Inicializa servicios de Sprint 3 tras el arranque (deep links + FCM stub).
+Future<void> initSprint3Services() async {
+  await FcmService.init();
+  await DeepLinkService.init(navigatorKey);
 }

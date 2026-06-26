@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../main.dart';
 import '../../services/auth_service.dart';
 import '../../services/location_service.dart';
 import '../../services/onboarding_service.dart';
@@ -42,6 +43,7 @@ class _BootstrapScreenState extends State<BootstrapScreen> {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute<void>(builder: (_) => const HomeScreen()),
       );
+      await initSprint3Services();
     } catch (e) {
       if (!mounted) return;
       setState(() => _error = e.toString());

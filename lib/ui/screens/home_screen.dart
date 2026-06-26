@@ -21,23 +21,38 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   final _mapController = MapController();
   LatLng? _userPosition;
   List<AlertaDesaparecido> _alertas = [];
   String? _error;
   bool _loading = true;
   StreamSubscription<List<AlertaDesaparecido>>? _alertasSub;
+  Timer? _ubicacionTimer;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initLocation();
+    _ubicacionTimer = Timer.periodic(
+      const Duration(minutes: 3),
+      (_) => LocationService.syncUbicacionToSupabase(),
+    );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      LocationService.syncUbicacionToSupabase();
+    }
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _alertasSub?.cancel();
+    _ubicacionTimer?.cancel();
     super.dispose();
   }
 
