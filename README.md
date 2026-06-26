@@ -42,8 +42,16 @@ Plataforma móvil de alertas comunitarias hiperlocales para reportes de personas
 | Sprint 0 — conexión | ✅ |
 | Sprint 1 — UI wireframes | ✅ |
 | Sprint 2 — backend en app | ✅ |
-| Sprint 3 — geofencing y amplificación | ✅ Lo vi, WhatsApp, deep links, moderación · ⏳ FCM tokens |
-| Sprint 4 — legal, QA, piloto | 🔄 En progreso |
+| Sprint 3 — geofencing y amplificación | ✅ |
+| Sprint 4 — legal, QA, piloto | ✅ Código listo · ⏳ Prueba Alfa Jipijapa |
+
+## Sprint 4 — entregables
+
+- **Términos y LOPDP** en onboarding (checkbox obligatorio + pantalla legal)
+- **Notificación al emisor** cuando alguien pulsa «Lo vi» (sin exponer teléfono)
+- **Compresión de fotos** objetivo < 300 KB (preview WhatsApp)
+- **Script APK** `./scripts/build_apk.sh`
+- **Checklist piloto** [Sprint-4-Checklist-Piloto.md](Documentos/Sprint-4-Checklist-Piloto.md)
 
 ## Sprint 3 — entregables
 
@@ -103,6 +111,7 @@ APK en `build/app/outputs/flutter-apk/app-release.apk`
 | 2025-06-26 | Sprint 1 — UI wireframes |
 | 2025-06-26 | Sprint 2 — alertas reales, Storage, onboarding |
 | 2025-06-27 | Sprint 3 — Lo vi, WhatsApp, deep links, moderación |
+| 2025-06-28 | Sprint 4 — legal LOPDP, avistamientos emisor, build APK |
 
 ## Piloto
 

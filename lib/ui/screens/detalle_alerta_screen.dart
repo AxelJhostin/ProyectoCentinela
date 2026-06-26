@@ -176,6 +176,8 @@ class _DetalleAlertaScreenState extends State<DetalleAlertaScreen> {
                   ),
                 ),
                 const SizedBox(height: CentinelaSpacing.lg),
+                if (esEmisor) _AvistamientosEmisorCard(alertaId: alerta.id),
+                if (esEmisor) const SizedBox(height: CentinelaSpacing.lg),
                 if (alerta.vestimenta.isNotEmpty)
                   Container(
                     width: double.infinity,
@@ -238,6 +240,47 @@ class _DetalleAlertaScreenState extends State<DetalleAlertaScreen> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _AvistamientosEmisorCard extends StatelessWidget {
+  const _AvistamientosEmisorCard({required this.alertaId});
+
+  final String alertaId;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<int>(
+      stream: AvistamientoService.watchCount(alertaId),
+      builder: (context, snapshot) {
+        final count = snapshot.data ?? 0;
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(CentinelaSpacing.md),
+          decoration: BoxDecoration(
+            color: CentinelaColors.community.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(CentinelaSpacing.radiusMd),
+            border: Border.all(color: CentinelaColors.community.withValues(alpha: 0.35)),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.groups_outlined, color: CentinelaColors.community),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  count == 0
+                      ? 'Aún no hay avistamientos. Comparte por WhatsApp para ampliar el alcance.'
+                      : '$count persona${count == 1 ? '' : 's'} reportaron «Lo vi»',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

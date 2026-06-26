@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../../main.dart';
+import '../../services/legal_service.dart';
 import '../../services/location_service.dart';
 import '../../services/onboarding_service.dart';
 import '../theme/centinela_spacing.dart';
 import '../theme/centinela_theme.dart';
 import 'home_screen.dart';
+import 'legal_terms_screen.dart';
 
 /// Onboarding — permisos GPS y notificaciones (Sprint 2).
 class OnboardingScreen extends StatefulWidget {
@@ -18,6 +20,7 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   bool _locationGranted = false;
   bool _notificationGranted = false;
+  bool _legalAccepted = false;
   bool _finishing = false;
 
   Future<void> _requestLocation() async {
@@ -32,13 +35,27 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _continuar() async {
+    if (!_legalAccepted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Debes aceptar los términos y la política de privacidad')),
+      );
+      return;
+    }
+
     setState(() => _finishing = true);
-    await OnboardingService.markCompleted();
-    if (!mounted) return;
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute<void>(builder: (_) => const HomeScreen()),
-    );
-    await initSprint3Services();
+    try {
+      await LegalService.acceptTerms();
+      await OnboardingService.markCompleted();
+      if (!mounted) return;
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute<void>(builder: (_) => const HomeScreen()),
+      );
+      await initSprint3Services();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      setState(() => _finishing = false);
+    }
   }
 
   @override
@@ -89,9 +106,31 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 granted: _notificationGranted,
                 onTap: _requestNotifications,
               ),
+              const SizedBox(height: CentinelaSpacing.md),
+              Material(
+                color: CentinelaColors.surface,
+                borderRadius: BorderRadius.circular(CentinelaSpacing.radiusMd),
+                child: CheckboxListTile(
+                  value: _legalAccepted,
+                  onChanged: _finishing
+                      ? null
+                      : (v) => setState(() => _legalAccepted = v ?? false),
+                  title: const Text(
+                    'Acepto Términos y tratamiento de datos (LOPDP)',
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                  ),
+                  subtitle: TextButton(
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(builder: (_) => const LegalTermsScreen()),
+                    ),
+                    child: const Text('Leer términos completos'),
+                  ),
+                  controlAffinity: ListTileControlAffinity.leading,
+                ),
+              ),
               const Spacer(),
               FilledButton(
-                onPressed: _finishing ? null : _continuar,
+                onPressed: (_finishing || !_legalAccepted) ? null : _continuar,
                 child: Text(_finishing ? 'Entrando…' : 'Continuar a Centinela'),
               ),
               const SizedBox(height: 8),

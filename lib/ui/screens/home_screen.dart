@@ -6,12 +6,14 @@ import 'package:latlong2/latlong.dart';
 
 import '../../models/alerta_desaparecido.dart';
 import '../../services/alerta_service.dart';
+import '../../services/avistamiento_service.dart';
 import '../../services/location_service.dart';
 import '../theme/centinela_theme.dart';
 import '../widgets/alerta_card.dart';
 import '../widgets/emitir_alerta_fab.dart';
 import 'detalle_alerta_screen.dart';
 import 'emision_screen.dart';
+import 'legal_terms_screen.dart';
 
 /// Pantalla 1 — Mapa + bottom sheet con datos en vivo de Supabase (Sprint 2).
 class HomeScreen extends StatefulWidget {
@@ -28,7 +30,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   String? _error;
   bool _loading = true;
   StreamSubscription<List<AlertaDesaparecido>>? _alertasSub;
+  StreamSubscription<int>? _avistamientosSub;
   Timer? _ubicacionTimer;
+  int _lastAvistamientoCount = 0;
+  bool _avistamientosReady = false;
 
   @override
   void initState() {
@@ -52,6 +57,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _alertasSub?.cancel();
+    _avistamientosSub?.cancel();
     _ubicacionTimer?.cancel();
     super.dispose();
   }
@@ -85,6 +91,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       });
 
       _subscribeRealtime(centro);
+      await _watchMisAvistamientos();
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -107,6 +114,34 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         if (mounted) setState(() => _error = e.toString());
       },
     );
+  }
+
+  Future<void> _watchMisAvistamientos() async {
+    _avistamientosSub?.cancel();
+    _avistamientosReady = false;
+
+    final alertaId = await AlertaService.miAlertaActivaId();
+    if (alertaId == null) return;
+
+    _lastAvistamientoCount = await AvistamientoService.contar(alertaId);
+    _avistamientosReady = true;
+
+    _avistamientosSub = AvistamientoService.watchCount(alertaId).listen((n) {
+      if (!mounted) return;
+      if (_avistamientosReady && n > _lastAvistamientoCount) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              n == 1
+                  ? '¡Alguien reportó haber visto tu alerta!'
+                  : '$n personas reportaron «Lo vi» en tu alerta',
+            ),
+            backgroundColor: CentinelaColors.community,
+          ),
+        );
+      }
+      _lastAvistamientoCount = n;
+    });
   }
 
   @override
@@ -160,6 +195,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     icon: const Icon(Icons.refresh),
                     tooltip: 'Actualizar',
                     onPressed: _initLocation,
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.gavel_outlined),
+                    tooltip: 'Términos y privacidad',
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(builder: (_) => const LegalTermsScreen()),
+                    ),
                   ),
                 ],
               ),

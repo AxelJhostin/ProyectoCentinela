@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -24,14 +25,36 @@ class FotoService {
     if (file == null) return null;
 
     final bytes = await file.readAsBytes();
-    final compressed = await FlutterImageCompress.compressWithList(
+    return _compressForUpload(bytes);
+  }
+
+  /// Objetivo WhatsApp OG: imagen < 300 KB (Sprint 4).
+  static Future<Uint8List> _compressForUpload(Uint8List bytes) async {
+    const maxBytes = 280 * 1024;
+    var quality = 82;
+
+    while (quality >= 50) {
+      final compressed = await FlutterImageCompress.compressWithList(
+        bytes,
+        minWidth: 800,
+        minHeight: 800,
+        quality: quality,
+        format: CompressFormat.jpeg,
+      );
+      if (compressed.length <= maxBytes) {
+        return Uint8List.fromList(compressed);
+      }
+      quality -= 8;
+    }
+
+    final fallback = await FlutterImageCompress.compressWithList(
       bytes,
-      minWidth: 800,
-      minHeight: 800,
-      quality: 82,
+      minWidth: 640,
+      minHeight: 640,
+      quality: 50,
       format: CompressFormat.jpeg,
     );
-    return Uint8List.fromList(compressed);
+    return Uint8List.fromList(fallback);
   }
 
   static Future<ImageSource?> _chooseSource() async {

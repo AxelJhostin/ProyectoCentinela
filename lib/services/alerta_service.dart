@@ -98,6 +98,19 @@ class AlertaService {
     await _client.rpc<void>('resolver_alerta', params: {'p_alerta_id': alertaId});
   }
 
+  /// Id de la alerta activa emitida por el usuario actual (si existe).
+  static Future<String?> miAlertaActivaId() async {
+    final miId = await currentUsuarioId;
+    if (miId == null) return null;
+    final row = await _client
+        .from('alertas_desaparecidos')
+        .select('id')
+        .eq('emisor_id', miId)
+        .eq('estado', 'ACTIVA')
+        .maybeSingle();
+    return row?['id'] as String?;
+  }
+
   /// Una alerta por id (activa o resuelta) para deep links.
   static Future<AlertaDesaparecido?> fetchById(
     String alertaId, {

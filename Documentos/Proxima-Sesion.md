@@ -1,31 +1,29 @@
 # Próxima sesión — Centinela
 
-## Estado Sprint 3
+## Estado actual
 
-| Tarea | Estado |
-|-------|--------|
-| 3.1 FCM token | ⏳ Stub listo — falta Firebase (`Documentos/Firebase-Setup.md`) |
-| 3.2 Push geofencing | ✅ Edge Function `dispatch-alert-push` |
-| 3.3 Deep links + OG | ✅ `centinela://alerta?id=…` + `alerta-preview` |
-| 3.4 WhatsApp | ✅ |
-| 3.5 Lo vi + Resolver | ✅ |
-| 3.6 Ubicación periódica | ✅ Timer 3 min + al volver a la app |
-| 3.7 Post-moderación | ✅ Reportar falsa + límites cuentas nuevas |
+| Sprint | Estado |
+|--------|--------|
+| 0–3 | ✅ Código en GitHub |
+| 4 | ✅ Legal, avistamientos emisor, APK script · ⏳ Piloto Jipijapa |
 
-## Probar (emulador o teléfono, cuando quieras)
+## Antes del piloto
+
+1. Configurar **Firebase** → [Firebase-Setup.md](Firebase-Setup.md)
+2. Generar APK: `./scripts/build_apk.sh`
+3. Seguir checklist → [Sprint-4-Checklist-Piloto.md](Sprint-4-Checklist-Piloto.md)
+
+## Comandos
 
 ```bash
+git pull
 flutter pub get
-flutter run
+flutter run              # desarrollo
+./scripts/build_apk.sh   # APK piloto
 ```
 
-1. Detalle → **Compartir WhatsApp** (mensaje + enlace preview).
-2. Detalle → **¡Lo Vi!** con GPS.
-3. Detalle → icono **bandera** → reportar alerta falsa.
-4. Deep link (terminal): `adb shell am start -a android.intent.action.VIEW -d "centinela://alerta?id=UUID_ALERTA"`
+## Pendiente post-Sprint 4
 
-## Siguiente: Sprint 4
-
-- Configurar Firebase para push real
-- QA legal + piloto Jipijapa
-- Pruebas con celulares físicos
+- Prueba Alfa en Jipijapa con 3+ dispositivos
+- Revisión legal del texto LOPDP por abogado
+- Firebase FCM para push real en campo
