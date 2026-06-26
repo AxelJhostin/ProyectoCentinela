@@ -31,6 +31,9 @@ build/
 # Supabase local
 .supabase/
 
+# Flutter env (copiar desde env/app.env.example)
+env/app.env
+
 # macOS
 .DS_Store
 

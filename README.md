@@ -2,6 +2,8 @@
 
 Plataforma móvil de alertas comunitarias hiperlocales para reportes de personas desaparecidas (MVP).
 
+**Repositorio:** https://github.com/AxelJhostin/ProyectoCentinela
+
 ## Documentación
 
 | Documento | Descripción |
@@ -10,6 +12,7 @@ Plataforma móvil de alertas comunitarias hiperlocales para reportes de personas
 | [SDD](Documentos/Documento%20de%20Diseño%20del%20Sistema%20(SDD)%20-%20Proyecto%20Centinela.docx) | Flujos, esquema BD, wireframes, WhatsApp |
 | [Backlog y Sprints](Documentos/Product%20Backlog%20y%20Plan%20de%20Sprints%20-%20Proyecto%20Centinela.docx) | Sprint 0–4, criterios de aceptación, DoD |
 | [Guía Supabase](Documentos/Guia-Aislamiento-Supabase-Centinela.docx) | Proyecto dedicado, separado de RECI |
+| [Sprint 0 — Guía](Documentos/Sprint-0-Guia-Paso-a-Paso.md) | Pasos detallados de arranque |
 
 ## Diseño
 
@@ -17,55 +20,96 @@ Plataforma móvil de alertas comunitarias hiperlocales para reportes de personas
 
 ## Stack (MVP)
 
-- **App móvil:** Flutter (Android piloto; iOS validación secundaria)
-- **Backend / BD:** Supabase (PostgreSQL + PostGIS) — **proyecto dedicado `centinela-mvp`**
-- **Push:** Firebase Cloud Messaging (FCM)
-- **Deep links web:** Vercel (página pública con Open Graph)
+| Capa | Tecnología |
+|------|------------|
+| App móvil | Flutter 3.x (Android piloto; iOS secundario) |
+| Backend / BD | Supabase `centinela-mvp` (PostgreSQL + PostGIS) |
+| Push | Firebase Cloud Messaging (Sprint 3) |
+| Deep links | Vercel (Sprint 3) |
 
-## Supabase — Regla crítica
-
-> **Nunca usar el mismo proyecto Supabase que RECI.** Centinela tiene su propia instancia, claves y migraciones.
-
-Variables de entorno (ejemplo):
-
-```env
-CENTINELA_SUPABASE_URL=https://xxxxx.supabase.co
-CENTINELA_SUPABASE_ANON_KEY=eyJ...
-```
-
-El esquema SQL inicial está en `supabase/migrations/`.
-
-## Estado actual
+## Estado del proyecto
 
 | Fase | Estado |
 |------|--------|
-| Requerimientos | Documentado |
-| Arquitectura / SDD | Documentado |
-| Diseño UI (Figma) | 3 pantallas core + design system |
-| Git local | Commit inicial hecho |
-| GitHub remoto | [AxelJhostin/ProyectoCentinela](https://github.com/AxelJhostin/ProyectoCentinela) |
-| Implementación Flutter | Pendiente (Sprint 0) |
-| Supabase | Sin crear aún |
+| Documentación | ✅ Completa |
+| GitHub | ✅ [ProyectoCentinela](https://github.com/AxelJhostin/ProyectoCentinela) |
+| Supabase `centinela-mvp` | ✅ Tablas + RLS + PostGIS |
+| Flutter — proyecto base | ✅ Sprint 0 |
+| Conexión Supabase en app | ✅ Botón de prueba (requiere auth anónimo) |
+| UI wireframes (Sprint 1) | ⏳ Pendiente |
+| Notificaciones / WhatsApp | ⏳ Sprint 3 |
 
-## GitHub
+## Estructura del código
 
-Repositorio: **https://github.com/AxelJhostin/ProyectoCentinela**
+```
+lib/
+├── config/          # Variables de entorno
+├── models/          # Modelos de datos
+├── services/        # Supabase, FCM, ubicación
+├── ui/
+│   ├── screens/     # Pantallas
+│   ├── widgets/     # Componentes reutilizables
+│   └── theme/       # Design system (colores Figma)
+supabase/migrations/ # SQL versionado
+env/                 # Claves locales (app.env no se sube a GitHub)
+Documentos/          # Word + guías
+```
 
-Para subir cambios futuros:
+## Configuración local (primera vez)
+
+```bash
+# 1. Clonar
+git clone https://github.com/AxelJhostin/ProyectoCentinela.git
+cd ProyectoCentinela
+
+# 2. Variables de entorno (claves de centinela-mvp, NO RECI)
+./scripts/setup_env.sh
+# Editar env/app.env con tu URL y publishable key de Supabase
+
+# 3. Supabase Auth — activar login anónimo (solo una vez)
+# Dashboard → Authentication → Providers → Anonymous → Enable
+
+# 4. Dependencias Flutter
+flutter pub get
+```
+
+## Ejecutar la app
+
+```bash
+flutter run
+```
+
+En la pantalla inicial, pulsa **「Probar conexión Supabase」** para validar Sprint 0 (Tarea 0.4).
+
+### Requisitos de desarrollo
+
+- Flutter SDK (`brew install --cask flutter`)
+- Android Studio o dispositivo Android para el piloto
+- Xcode (opcional, para probar en iPhone)
+
+```bash
+flutter doctor
+```
+
+## Supabase — Regla crítica
+
+> **Nunca usar el mismo proyecto Supabase que RECI.** Centinela usa `centinela-mvp` (`wziwufumjtpjqyuzzzyn`).
+
+Migración inicial: `supabase/migrations/20250625000000_initial_schema.sql`
+
+## Git — registrar cambios
 
 ```bash
 git add .
-git commit -m "Descripción del cambio"
+git commit -m "Descripción clara del cambio"
 git push
 ```
-
-Guía Sprint 0 completa: [Documentos/Sprint-0-Guia-Paso-a-Paso.md](Documentos/Sprint-0-Guia-Paso-a-Paso.md)
-
-## Próximo paso técnico
-
-**Sprint 0:** crear repo Flutter, proyecto Supabase `centinela-mvp`, ejecutar migración SQL, conectar SDK.
 
 ## Piloto
 
 - **Alfa:** Jipijapa (Android)
-- **Beta:** Portoviejo (escala + posible iOS TestFlight)
+- **Beta:** Portoviejo (+ iOS opcional)
+
+## Próximo paso
+
+**Sprint 1:** Maquetar Home (mapa + bottom sheet + FAB), formulario de emisión y detalle de alerta según Figma.
