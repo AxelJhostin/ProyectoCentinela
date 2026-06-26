@@ -1,0 +1,38 @@
+# Secretos — NUNCA commitear
+.env
+.env.*
+!.env.example
+
+# Flutter / Dart
+.dart_tool/
+.packages
+build/
+*.iml
+.idea/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+**/doc/api/
+
+# Android / iOS (generados por Flutter)
+**/android/.gradle/
+**/android/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+
+# Claves locales (nunca subir)
+**/google-services.json
+**/GoogleService-Info.plist
+
+# Supabase local
+.supabase/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
