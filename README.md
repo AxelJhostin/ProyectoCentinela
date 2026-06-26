@@ -4,6 +4,23 @@ Plataforma móvil de alertas comunitarias hiperlocales para reportes de personas
 
 **Repositorio:** https://github.com/AxelJhostin/ProyectoCentinela
 
+---
+
+## Cierre de sesión (26 jun 2025)
+
+Todo el código está **commiteado y en GitHub** (`8226c0e`). Puedes pausar tranquilo.
+
+| Hoy | Estado |
+|-----|--------|
+| Sprint 0 | ✅ Probado (conexión Supabase en emulador Mac) |
+| Sprint 1 | ✅ UI completa (mock) |
+| Sprint 2 | ✅ **Código listo** — falta probar bien en otra PC |
+| Sprint 3+ | ⏳ Para otra sesión |
+
+**Continuar en la PC grande:** lee [Documentos/Proxima-Sesion.md](Documentos/Proxima-Sesion.md) (clonar repo, `env/app.env`, `flutter run`).
+
+---
+
 ## Documentación
 
 | Documento | Descripción |
@@ -13,6 +30,7 @@ Plataforma móvil de alertas comunitarias hiperlocales para reportes de personas
 | [Backlog y Sprints](Documentos/Product%20Backlog%20y%20Plan%20de%20Sprints%20-%20Proyecto%20Centinela.docx) | Sprint 0–4, criterios de aceptación, DoD |
 | [Guía Supabase](Documentos/Guia-Aislamiento-Supabase-Centinela.docx) | Proyecto dedicado, separado de RECI |
 | [Sprint 0 — Guía](Documentos/Sprint-0-Guia-Paso-a-Paso.md) | Pasos detallados de arranque |
+| [**Próxima sesión**](Documentos/Proxima-Sesion.md) | **Setup en otra PC + qué probar mañana** |
 
 ## Diseño
 
@@ -33,12 +51,12 @@ Plataforma móvil de alertas comunitarias hiperlocales para reportes de personas
 |------|--------|
 | Documentación | ✅ Completa |
 | GitHub | ✅ [ProyectoCentinela](https://github.com/AxelJhostin/ProyectoCentinela) |
-| Supabase `centinela-mvp` | ✅ Tablas + RLS + PostGIS |
-| Flutter — proyecto base | ✅ |
-| Sprint 0 — conexión Supabase | ✅ Validado en emulador Pixel 9 |
-| Sprint 1 — UI wireframes (mock) | ✅ Home, Emisión, Detalle |
-| Sprint 2 — lógica + Supabase | ✅ Onboarding, fotos, alertas reales, mapa en vivo |
-| Notificaciones / WhatsApp | ⏳ Sprint 3 |
+| Supabase `centinela-mvp` | ✅ Tablas + Storage + RPCs + Realtime |
+| Sprint 0 — conexión | ✅ Validado en Mac |
+| Sprint 1 — UI | ✅ |
+| Sprint 2 — backend en app | ✅ Código · ⏳ QA en PC grande |
+| Sprint 3 — push / WhatsApp / Lo vi | ⏳ Siguiente desarrollo |
+| Sprint 4 — piloto Jipijapa | ⏳ |
 
 ## Estructura del código
 
@@ -46,94 +64,57 @@ Plataforma móvil de alertas comunitarias hiperlocales para reportes de personas
 lib/
 ├── config/          # Variables de entorno
 ├── models/          # Modelos de datos
-├── services/        # Supabase, FCM, ubicación
+├── services/        # auth, alertas, fotos, ubicación
 ├── ui/
-│   ├── screens/     # Pantallas
-│   ├── widgets/     # Componentes reutilizables
-│   └── theme/       # Design system (colores Figma)
-supabase/migrations/ # SQL versionado
-env/                 # Claves locales (app.env no se sube a GitHub)
-Documentos/          # Word + guías
+│   ├── screens/     # bootstrap, onboarding, home, emisión, detalle
+│   ├── widgets/
+│   └── theme/
+supabase/migrations/
+env/app.env          # Claves locales (NO subir a GitHub)
 ```
 
-## Configuración local (primera vez)
+## Configuración en una PC nueva
 
 ```bash
-# 1. Clonar
 git clone https://github.com/AxelJhostin/ProyectoCentinela.git
 cd ProyectoCentinela
-
-# 2. Variables de entorno (claves de centinela-mvp, NO RECI)
 ./scripts/setup_env.sh
-# Editar env/app.env con tu URL y publishable key de Supabase
-
-# 3. Supabase Auth — activar login anónimo (solo una vez)
-# Dashboard → Authentication → Providers → Anonymous → Enable
-
-# 4. Dependencias Flutter
+# Editar env/app.env con claves de centinela-mvp
 flutter pub get
-```
-
-## Ejecutar la app
-
-Guía completa (Chrome, emulador, teléfono): [Documentos/Ejecutar-App-Dispositivos.md](Documentos/Ejecutar-App-Dispositivos.md)
-
-### Prueba rápida en Chrome (Sprint 0)
-
-```bash
-flutter run -d chrome
-```
-
-### Android (piloto)
-
-```bash
-# 1. Enciende emulador en Android Studio (Device Manager → Play en Pixel 9)
-#    O conecta tu teléfono con depuración USB
-flutter devices
 flutter run
 ```
 
-### Requisitos de desarrollo
+Detalle completo: [Documentos/Proxima-Sesion.md](Documentos/Proxima-Sesion.md)
 
-- Flutter SDK (`brew install --cask flutter`)
-- Android Studio o dispositivo Android para el piloto
-- Xcode (opcional, para probar en iPhone)
+## Ejecutar la app
+
+Guía dispositivos: [Documentos/Ejecutar-App-Dispositivos.md](Documentos/Ejecutar-App-Dispositivos.md)
 
 ```bash
-flutter doctor
+flutter devices
+flutter run                    # Android emulador o teléfono
+flutter run -d chrome          # Prueba rápida web (limitada)
 ```
 
 ## Supabase — Regla crítica
 
-> **Nunca usar el mismo proyecto Supabase que RECI.** Centinela usa `centinela-mvp` (`wziwufumjtpjqyuzzzyn`).
+> **Nunca usar el mismo proyecto Supabase que RECI.** Proyecto: `centinela-mvp` · ref `wziwufumjtpjqyuzzzyn`
 
-Migración inicial: `supabase/migrations/20250625000000_initial_schema.sql`
+Migraciones en `supabase/migrations/` (aplicadas en la nube vía dashboard/MCP).
 
-## Git — registrar cambios
+## Próxima sesión (orden sugerido)
 
-```bash
-git add .
-git commit -m "Descripción clara del cambio"
-git push
-```
+1. **Probar Sprint 2** en PC grande (emitir alerta + ver en mapa) — checklist en [Proxima-Sesion.md](Documentos/Proxima-Sesion.md)
+2. **Sprint 3:** FCM, geofencing push, WhatsApp deep links, botón «Lo vi»
+3. **Sprint 4:** QA, legal, APK piloto Jipijapa
+
+## Hitos
+
+- **2025-06-25:** Sprint 0 — Flutter ↔ Supabase en emulador
+- **2025-06-26:** Sprint 1 — UI wireframes
+- **2025-06-26:** Sprint 2 — alertas reales, Storage, onboarding (código; QA pendiente en PC grande)
 
 ## Piloto
 
 - **Alfa:** Jipijapa (Android)
 - **Beta:** Portoviejo (+ iOS opcional)
-
-## Próximo paso
-
-**Sprint 3 — Geofencing y amplificación:** push notifications (FCM), deep links WhatsApp, botón «Lo vi».
-
-### Probar Sprint 2 en el emulador
-
-1. Al abrir la app verás **Onboarding** (permisos GPS y notificaciones).
-2. En el emulador Pixel 9: **⋯ → Location** → fija coordenadas de Jipijapa (`-1.0, -80.58`) para que el GPS funcione.
-3. Pulsa **EMITIR ALERTA** → sube foto → envía → debe aparecer en el mapa y en la lista.
-
-### Hitos completados
-
-- **2025-06-25:** Sprint 0 cerrado — app Flutter ↔ Supabase `centinela-mvp` en emulador Android.
-- **2025-06-26:** Sprint 1 cerrado — 3 pantallas Figma con mock data.
-- **2025-06-26:** Sprint 2 cerrado — alertas reales, Storage, onboarding y realtime.
