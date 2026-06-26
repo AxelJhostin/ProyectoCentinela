@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../../services/alerta_service.dart';
 import '../../services/foto_service.dart';
@@ -9,6 +9,7 @@ import '../../services/location_service.dart';
 import '../../services/push_service.dart';
 import '../theme/centinela_spacing.dart';
 import '../theme/centinela_theme.dart';
+import '../widgets/ubicacion_pin_picker.dart';
 
 /// Pantalla 2 — Formulario exprés con foto real y guardado en Supabase (Sprint 2).
 class EmisionScreen extends StatefulWidget {
@@ -23,20 +24,23 @@ class _EmisionScreenState extends State<EmisionScreen> {
   final _nombreController = TextEditingController();
   final _edadController = TextEditingController();
   final _vestimentaController = TextEditingController();
+  final _ultimaVistaController = TextEditingController();
 
   Uint8List? _fotoBytes;
-  Position? _ubicacion;
+  LatLng? _ubicacionPin;
   bool _enviando = false;
 
   @override
   void initState() {
     super.initState();
-    _cargarUbicacion();
+    _cargarUbicacionInicial();
   }
 
-  Future<void> _cargarUbicacion() async {
+  Future<void> _cargarUbicacionInicial() async {
     final pos = await LocationService.getCurrentPosition();
-    if (mounted) setState(() => _ubicacion = pos);
+    if (mounted && pos != null) {
+      setState(() => _ubicacionPin = LatLng(pos.latitude, pos.longitude));
+    }
   }
 
   @override
@@ -44,6 +48,7 @@ class _EmisionScreenState extends State<EmisionScreen> {
     _nombreController.dispose();
     _edadController.dispose();
     _vestimentaController.dispose();
+    _ultimaVistaController.dispose();
     super.dispose();
   }
 
@@ -93,9 +98,9 @@ class _EmisionScreenState extends State<EmisionScreen> {
     }
     if (!_formKey.currentState!.validate()) return;
 
-    if (_ubicacion == null) {
+    if (_ubicacionPin == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Activa el GPS para marcar la ubicación')),
+        const SnackBar(content: Text('Marca en el mapa la última ubicación vista')),
       );
       return;
     }
@@ -110,13 +115,14 @@ class _EmisionScreenState extends State<EmisionScreen> {
         edadAprox: int.parse(_edadController.text),
         vestimenta: _vestimentaController.text.trim(),
         fotoUrl: fotoUrl,
-        lat: _ubicacion!.latitude,
-        lng: _ubicacion!.longitude,
+        lat: _ubicacionPin!.latitude,
+        lng: _ubicacionPin!.longitude,
+        ultimaVistaTexto: _ultimaVistaController.text.trim(),
       );
       await PushService.notificarUsuariosCercanos(
         alertaId: alertaId,
-        lat: _ubicacion!.latitude,
-        lng: _ubicacion!.longitude,
+        lat: _ubicacionPin!.latitude,
+        lng: _ubicacionPin!.longitude,
         nombrePersona: nombre,
       );
 
@@ -192,36 +198,27 @@ class _EmisionScreenState extends State<EmisionScreen> {
             ),
             const SizedBox(height: CentinelaSpacing.lg),
             Text(
-              'Última ubicación',
+              'Última ubicación vista',
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: CentinelaSpacing.sm),
-            Container(
-              height: 140,
-              padding: const EdgeInsets.all(CentinelaSpacing.md),
-              decoration: BoxDecoration(
-                color: CentinelaColors.border.withValues(alpha: 0.35),
-                borderRadius: BorderRadius.circular(CentinelaSpacing.radiusMd),
-                border: Border.all(color: CentinelaColors.border),
+            TextFormField(
+              controller: _ultimaVistaController,
+              enabled: !_enviando,
+              decoration: const InputDecoration(
+                labelText: 'Descripción del lugar',
+                hintText: 'Ej: Universidad, frente al parque central',
               ),
-              child: _ubicacion == null
-                  ? const Center(child: Text('Obteniendo GPS…'))
-                  : Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.location_on, color: CentinelaColors.alertCritical, size: 32),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Lat ${_ubicacion!.latitude.toStringAsFixed(5)}, '
-                          'Lng ${_ubicacion!.longitude.toStringAsFixed(5)}',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                        TextButton(onPressed: _cargarUbicacion, child: const Text('Actualizar GPS')),
-                      ],
-                    ),
+              textCapitalization: TextCapitalization.sentences,
+            ),
+            const SizedBox(height: CentinelaSpacing.md),
+            UbicacionPinPicker(
+              position: _ubicacionPin,
+              enabled: !_enviando,
+              height: 200,
+              onChanged: (p) => setState(() => _ubicacionPin = p),
             ),
             const SizedBox(height: 100),
           ],

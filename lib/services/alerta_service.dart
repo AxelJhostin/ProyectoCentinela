@@ -78,6 +78,7 @@ class AlertaService {
     required double lat,
     required double lng,
     int radioKm = 5,
+    String? ultimaVistaTexto,
   }) async {
     final id = await _client.rpc<dynamic>(
       'crear_alerta_desaparecido',
@@ -89,6 +90,7 @@ class AlertaService {
         'p_lat': lat,
         'p_lng': lng,
         'p_radio_km': radioKm,
+        'p_ultima_vista_texto': ultimaVistaTexto,
       },
     );
     return id.toString();

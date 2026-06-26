@@ -1,4 +1,6 @@
-# Firebase Cloud Messaging — Centinela (Sprint 3)
+# Firebase Cloud Messaging — Centinela (Sprint 5.2)
+
+**Supabase** guarda alertas, ubicaciones y tokens; **Firebase FCM** envía la notificación nativa al celular (app cerrada). Ambos se usan juntos, no uno en lugar del otro.
 
 Las notificaciones push requieren Firebase **separado de RECI**. La app ya invoca la Edge Function `dispatch-alert-push`; falta registrar tokens FCM en `usuarios.fcm_token`.
 

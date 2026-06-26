@@ -10,11 +10,14 @@ class ShareService {
 
   static String mensajeWhatsApp(AlertaDesaparecido alerta) {
     final link = AppEnv.alertaPreviewUrl(alerta.id);
+    final lugar = alerta.ultimaVistaTexto.isNotEmpty
+        ? '\nÚltimo lugar visto: ${alerta.ultimaVistaTexto}'
+        : '';
     return '''🚨 ALERTA COMUNITARIA: PERSONA DESAPARECIDA 🚨
 
 Nombre: ${alerta.nombrePersona}
 Edad: ${alerta.edadAprox} años
-Vestimenta: ${alerta.vestimenta}
+Vestimenta: ${alerta.vestimenta}$lugar
 
 🔗 Ver detalles y ayudar:
 $link
@@ -24,10 +27,21 @@ ${DeepLinkService.alertaDeepLink(alerta.id)}''';
   }
 
   static Future<bool> compartirWhatsApp(AlertaDesaparecido alerta) async {
-    final uri = Uri.parse(
-      'https://wa.me/?text=${Uri.encodeComponent(mensajeWhatsApp(alerta))}',
-    );
-    if (!await canLaunchUrl(uri)) return false;
-    return launchUrl(uri, mode: LaunchMode.externalApplication);
+    final text = Uri.encodeComponent(mensajeWhatsApp(alerta));
+
+    final uris = [
+      Uri.parse('whatsapp://send?text=$text'),
+      Uri.parse('https://wa.me/?text=$text'),
+    ];
+
+    for (final uri in uris) {
+      try {
+        final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+        if (launched) return true;
+      } catch (_) {
+        continue;
+      }
+    }
+    return false;
   }
 }

@@ -15,6 +15,7 @@ class AlertaDesaparecido {
     required this.fotoUrl,
     required this.radioKm,
     required this.creadoEn,
+    this.ultimaVistaTexto = '',
   });
 
   final String id;
@@ -22,6 +23,7 @@ class AlertaDesaparecido {
   final String nombrePersona;
   final int edadAprox;
   final String vestimenta;
+  final String ultimaVistaTexto;
   final double distanciaKm;
   final int minutosReportada;
   final double latitud;
@@ -63,6 +65,7 @@ class AlertaDesaparecido {
       nombrePersona: map['nombre_persona'] as String,
       edadAprox: map['edad_aprox'] as int,
       vestimenta: (map['vestimenta'] as String?) ?? '',
+      ultimaVistaTexto: (map['ultima_vista_texto'] as String?) ?? '',
       distanciaKm: distancia,
       minutosReportada: minutos,
       latitud: lat,

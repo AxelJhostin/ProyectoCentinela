@@ -1,14 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../models/alerta_desaparecido.dart';
 import '../../services/alerta_service.dart';
 import '../../services/avistamiento_service.dart';
-import '../../services/location_service.dart';
 import '../../services/moderacion_service.dart';
 import '../../services/share_service.dart';
 import '../theme/centinela_spacing.dart';
 import '../theme/centinela_theme.dart';
 import '../widgets/centinela_action_button.dart';
+import 'confirmar_avistamiento_screen.dart';
 
 /// Pantalla 3 — Detalle de alerta (Sprint 2: foto real + resolver si eres emisor).
 class DetalleAlertaScreen extends StatefulWidget {
@@ -23,7 +25,6 @@ class DetalleAlertaScreen extends StatefulWidget {
 class _DetalleAlertaScreenState extends State<DetalleAlertaScreen> {
   bool? _esEmisor;
   bool _resolviendo = false;
-  bool _registrandoLoVi = false;
   bool _compartiendo = false;
   bool _reportandoFalsa = false;
 
@@ -83,24 +84,18 @@ class _DetalleAlertaScreenState extends State<DetalleAlertaScreen> {
   }
 
   Future<void> _reportarLoVi() async {
-    setState(() => _registrandoLoVi = true);
-    try {
-      await LocationService.syncUbicacionToSupabase();
-      await AvistamientoService.registrarLoVi(widget.alerta.id);
-      if (!mounted) return;
+    final ok = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => ConfirmarAvistamientoScreen(alertaId: widget.alerta.id),
+      ),
+    );
+    if (ok == true && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Gracias. Tu avistamiento fue registrado.'),
           backgroundColor: CentinelaColors.community,
         ),
       );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
-    } finally {
-      if (mounted) setState(() => _registrandoLoVi = false);
     }
   }
 
@@ -175,6 +170,31 @@ class _DetalleAlertaScreenState extends State<DetalleAlertaScreen> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
+                if (alerta.ultimaVistaTexto.isNotEmpty) ...[
+                  const SizedBox(height: CentinelaSpacing.md),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(CentinelaSpacing.md),
+                    decoration: BoxDecoration(
+                      color: CentinelaColors.surface,
+                      borderRadius: BorderRadius.circular(CentinelaSpacing.radiusMd),
+                      border: Border.all(color: CentinelaColors.border),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Último lugar visto',
+                          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                            color: CentinelaColors.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(alerta.ultimaVistaTexto),
+                      ],
+                    ),
+                  ),
+                ],
                 const SizedBox(height: CentinelaSpacing.lg),
                 if (esEmisor) _AvistamientosEmisorCard(alertaId: alerta.id),
                 if (esEmisor) const SizedBox(height: CentinelaSpacing.lg),
@@ -232,7 +252,7 @@ class _DetalleAlertaScreenState extends State<DetalleAlertaScreen> {
                           label: '¡Lo Vi!',
                           color: CentinelaColors.community,
                           icon: Icons.my_location,
-                          onPressed: _registrandoLoVi ? null : _reportarLoVi,
+                          onPressed: _reportarLoVi,
                         ),
                       ],
                     ),
@@ -244,34 +264,64 @@ class _DetalleAlertaScreenState extends State<DetalleAlertaScreen> {
   }
 }
 
-class _AvistamientosEmisorCard extends StatelessWidget {
+class _AvistamientosEmisorCard extends StatefulWidget {
   const _AvistamientosEmisorCard({required this.alertaId});
 
   final String alertaId;
 
   @override
+  State<_AvistamientosEmisorCard> createState() => _AvistamientosEmisorCardState();
+}
+
+class _AvistamientosEmisorCardState extends State<_AvistamientosEmisorCard> {
+  List<AvistamientoResumen> _resumen = [];
+  StreamSubscription<int>? _sub;
+  int _count = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _sub = AvistamientoService.watchCount(widget.alertaId).listen((count) {
+      if (mounted) setState(() => _count = count);
+      _loadResumen();
+    });
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _loadResumen() async {
+    try {
+      final items = await AvistamientoService.resumen(widget.alertaId);
+      if (mounted) setState(() => _resumen = items);
+    } catch (_) {}
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return StreamBuilder<int>(
-      stream: AvistamientoService.watchCount(alertaId),
-      builder: (context, snapshot) {
-        final count = snapshot.data ?? 0;
-        return Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(CentinelaSpacing.md),
-          decoration: BoxDecoration(
-            color: CentinelaColors.community.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(CentinelaSpacing.radiusMd),
-            border: Border.all(color: CentinelaColors.community.withValues(alpha: 0.35)),
-          ),
-          child: Row(
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(CentinelaSpacing.md),
+      decoration: BoxDecoration(
+        color: CentinelaColors.community.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(CentinelaSpacing.radiusMd),
+        border: Border.all(color: CentinelaColors.community.withValues(alpha: 0.35)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
               const Icon(Icons.groups_outlined, color: CentinelaColors.community),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  count == 0
-                      ? 'Aún no hay avistamientos. Comparte por WhatsApp para ampliar el alcance.'
-                      : '$count persona${count == 1 ? '' : 's'} reportaron «Lo vi»',
+                  _count == 0
+                      ? 'Aún no hay avistamientos. Comparte por WhatsApp.'
+                      : '$_count persona${_count == 1 ? '' : 's'} reportaron «Lo vi»',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w500,
                   ),
@@ -279,8 +329,20 @@ class _AvistamientosEmisorCard extends StatelessWidget {
               ),
             ],
           ),
-        );
-      },
+          if (_resumen.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            ..._resumen.map(
+              (r) => Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  '• ${r.texto}',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

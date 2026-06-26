@@ -1,29 +1,18 @@
 # Próxima sesión — Centinela
 
-## Estado actual
+## Estado
 
 | Sprint | Estado |
 |--------|--------|
-| 0–3 | ✅ Código en GitHub |
-| 4 | ✅ Legal, avistamientos emisor, APK script · ⏳ Piloto Jipijapa |
+| 5.1 | ✅ Fixes piloto (WhatsApp, mapa, Lo vi) |
+| 5.2 | ⏳ Firebase push (cuando configures consola) |
 
-## Antes del piloto
+## Re-probar en celular
 
-1. Configurar **Firebase** → [Firebase-Setup.md](Firebase-Setup.md)
-2. Generar APK: `./scripts/build_apk.sh`
-3. Seguir checklist → [Sprint-4-Checklist-Piloto.md](Sprint-4-Checklist-Piloto.md)
+1. Generar nuevo APK: `./scripts/build_apk.sh`
+2. Instalar (Play Protect → Más detalles → Instalar de todas formas)
+3. Checklist: [Sprint-5-Backlog-Fixes-Piloto.md](Sprint-5-Backlog-Fixes-Piloto.md)
 
-## Comandos
+## Firebase (Sprint 5.2 — al final)
 
-```bash
-git pull
-flutter pub get
-flutter run              # desarrollo
-./scripts/build_apk.sh   # APK piloto
-```
-
-## Pendiente post-Sprint 4
-
-- Prueba Alfa en Jipijapa con 3+ dispositivos
-- Revisión legal del texto LOPDP por abogado
-- Firebase FCM para push real en campo
+Supabase = datos + Realtime (app abierta). Firebase FCM = push al celular con app cerrada. Ver [Firebase-Setup.md](Firebase-Setup.md).

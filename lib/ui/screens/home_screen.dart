@@ -90,6 +90,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         _loading = false;
       });
 
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _mapController.move(centro, 15);
+      });
+
       _subscribeRealtime(centro);
       await _watchMisAvistamientos();
     } catch (e) {
@@ -170,14 +174,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ..._alertas.map(_markerForAlerta),
                   Marker(
                     point: centro,
-                    width: 20,
-                    height: 20,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: CentinelaColors.community,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 3),
-                      ),
+                    width: 48,
+                    height: 48,
+                    child: const Icon(
+                      Icons.my_location,
+                      color: CentinelaColors.community,
+                      size: 40,
                     ),
                   ),
                 ],
@@ -208,8 +210,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             ),
           ),
           DraggableScrollableSheet(
-            initialChildSize: 0.24,
-            minChildSize: 0.16,
+            initialChildSize: 0.18,
+            minChildSize: 0.14,
             maxChildSize: 0.55,
             builder: (context, scrollController) {
               return Container(
@@ -228,6 +230,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               );
             },
           ),
+          if (_userPosition != null)
+            Positioned(
+              right: 16,
+              bottom: 120,
+              child: FloatingActionButton.small(
+                heroTag: 'centro_mapa',
+                onPressed: () => _mapController.move(_userPosition!, 15),
+                backgroundColor: CentinelaColors.surface,
+                foregroundColor: CentinelaColors.community,
+                child: const Icon(Icons.my_location),
+              ),
+            ),
         ],
       ),
       floatingActionButton: EmitirAlertaFab(

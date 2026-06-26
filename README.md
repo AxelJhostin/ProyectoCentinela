@@ -17,6 +17,7 @@ Plataforma móvil de alertas comunitarias hiperlocales para reportes de personas
 | [Sprint 0 — Guía](Documentos/Sprint-0-Guia-Paso-a-Paso.md) | Pasos detallados de arranque |
 | [Firebase FCM](Documentos/Firebase-Setup.md) | Configurar push notifications |
 | [Piloto Jipijapa](Documentos/Sprint-4-Checklist-Piloto.md) | Checklist y métricas Sprint 4 |
+| [**Sprint 5 — Fixes piloto**](Documentos/Sprint-5-Backlog-Fixes-Piloto.md) | Correcciones post-prueba Alfa |
 | [Próxima sesión](Documentos/Proxima-Sesion.md) | Estado actual y qué hacer |
 
 ## Diseño
@@ -43,7 +44,17 @@ Plataforma móvil de alertas comunitarias hiperlocales para reportes de personas
 | Sprint 1 — UI wireframes | ✅ |
 | Sprint 2 — backend en app | ✅ |
 | Sprint 3 — geofencing y amplificación | ✅ |
-| Sprint 4 — legal, QA, piloto | ✅ Código listo · ⏳ Prueba Alfa Jipijapa |
+| Sprint 4 — legal, QA, piloto | ✅ Prueba Alfa realizada |
+| Sprint 5 — fixes piloto | ✅ 5.1 WhatsApp/mapa/Lo vi · ⏳ 5.2 Firebase push |
+
+## Sprint 5 — entregables (post-prueba Alfa)
+
+- **WhatsApp** arreglado en Android (manifest + intent directo)
+- **Mapa Home** centra en GPS, marcador visible, botón ubicación
+- **Emisión** con pin en mapa + texto «Último lugar visto»
+- **Lo vi** con pantalla para marcar dónde
+- **Realtime** avistamientos + resumen para emisor
+- **Pendiente 5.2:** Firebase FCM para push con app cerrada
 
 ## Sprint 4 — entregables
 
@@ -112,6 +123,7 @@ APK en `build/app/outputs/flutter-apk/app-release.apk`
 | 2025-06-26 | Sprint 2 — alertas reales, Storage, onboarding |
 | 2025-06-27 | Sprint 3 — Lo vi, WhatsApp, deep links, moderación |
 | 2025-06-28 | Sprint 4 — legal LOPDP, avistamientos emisor, build APK |
+| 2025-06-29 | Sprint 5.1 — fixes piloto: WhatsApp, mapa, Lo vi con pin |
 
 ## Piloto
 

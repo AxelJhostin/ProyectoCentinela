@@ -163,6 +163,12 @@ def update_sprint_backlog() -> None:
             "• Variables de entorno apuntan al proyecto Supabase centinela-mvp (nunca RECI).",
             "• Políticas RLS activas en tablas expuestas.",
             "• Documentación del sprint actualizada si hubo cambios de alcance.",
+            "",
+            "Sprint 5: Fixes Piloto Alfa (Post-prueba en campo)",
+            "Objetivo: corregir hallazgos de la prueba con 3 Android en Jipijapa.",
+            "Tarea 5.1: WhatsApp (manifest Android + intent), mapa Home usable, emisión con pin en mapa y texto de último lugar visto.",
+            "Tarea 5.2: Lo vi con confirmación en mapa; Realtime en reacciones_avistamientos; resumen de avistamientos para emisor.",
+            "Tarea 5.3: Firebase FCM para push con app cerrada (después de validar 5.1 en campo).",
         ],
     )
 
