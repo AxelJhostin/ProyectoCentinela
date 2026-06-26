@@ -68,6 +68,26 @@ flutter devices
 flutter run
 ```
 
+### ⏱ Primera compilación Android (importante)
+
+La **primera vez** verás:
+
+```
+Running Gradle task 'assembleDebug'...
+```
+
+Puede tardar **10 a 15 minutos** (Gradle descarga dependencias). **No canceles** — no está colgado.
+
+Las siguientes veces suele tardar **30 segundos a 2 minutos**.
+
+Si ves caracteres raros (`^[[1;2A`) fue por pulsar teclas mientras giraba el spinner — ignóralos.
+
+Para ver más detalle:
+
+```bash
+flutter run -v
+```
+
 ---
 
 ## Comandos útiles
