@@ -47,6 +47,12 @@
 			</array>
 		</dict>
 	</dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Centinela usa tu ubicación para alertas de desaparición cerca de ti.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Centinela necesita la cámara para fotos en reportes de emergencia.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Centinela necesita acceder a fotos para reportes de desaparición.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

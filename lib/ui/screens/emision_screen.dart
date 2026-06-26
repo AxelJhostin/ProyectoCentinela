@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:image_picker/image_picker.dart';
 
+import '../../services/alerta_service.dart';
+import '../../services/foto_service.dart';
+import '../../services/location_service.dart';
 import '../theme/centinela_spacing.dart';
 import '../theme/centinela_theme.dart';
 
-/// Pantalla 2 — Formulario exprés de emisión (Sprint 1, mock submit).
+/// Pantalla 2 — Formulario exprés con foto real y guardado en Supabase (Sprint 2).
 class EmisionScreen extends StatefulWidget {
   const EmisionScreen({super.key});
 
@@ -17,7 +22,21 @@ class _EmisionScreenState extends State<EmisionScreen> {
   final _nombreController = TextEditingController();
   final _edadController = TextEditingController();
   final _vestimentaController = TextEditingController();
-  bool _fotoSeleccionada = false;
+
+  Uint8List? _fotoBytes;
+  Position? _ubicacion;
+  bool _enviando = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarUbicacion();
+  }
+
+  Future<void> _cargarUbicacion() async {
+    final pos = await LocationService.getCurrentPosition();
+    if (mounted) setState(() => _ubicacion = pos);
+  }
 
   @override
   void dispose() {
@@ -27,15 +46,45 @@ class _EmisionScreenState extends State<EmisionScreen> {
     super.dispose();
   }
 
-  void _simularFoto() {
-    setState(() => _fotoSeleccionada = true);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Mock: foto seleccionada (Sprint 2 subirá a Supabase)')),
+  Future<void> _elegirFoto(ImageSource source) async {
+    final bytes = source == ImageSource.camera
+        ? await FotoService.pickFromCamera()
+        : await FotoService.pickFromGallery();
+    if (bytes != null && mounted) {
+      setState(() => _fotoBytes = bytes);
+    }
+  }
+
+  void _mostrarOpcionesFoto() {
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Galería'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _elegirFoto(ImageSource.gallery);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_camera),
+              title: const Text('Cámara'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _elegirFoto(ImageSource.camera);
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  void _enviar() {
-    if (!_fotoSeleccionada) {
+  Future<void> _enviar() async {
+    if (_fotoBytes == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('La fotografía es obligatoria')),
       );
@@ -43,13 +92,42 @@ class _EmisionScreenState extends State<EmisionScreen> {
     }
     if (!_formKey.currentState!.validate()) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Mock: alerta enviada a la comunidad (Sprint 2 conectará backend)'),
-        backgroundColor: CentinelaColors.alertCritical,
-      ),
-    );
-    Navigator.of(context).pop();
+    if (_ubicacion == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Activa el GPS para marcar la ubicación')),
+      );
+      return;
+    }
+
+    setState(() => _enviando = true);
+
+    try {
+      final fotoUrl = await FotoService.uploadAlertaFoto(_fotoBytes!);
+      await AlertaService.crearAlerta(
+        nombrePersona: _nombreController.text.trim(),
+        edadAprox: int.parse(_edadController.text),
+        vestimenta: _vestimentaController.text.trim(),
+        fotoUrl: fotoUrl,
+        lat: _ubicacion!.latitude,
+        lng: _ubicacion!.longitude,
+      );
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Alerta enviada a la comunidad'),
+          backgroundColor: CentinelaColors.alertCritical,
+        ),
+      );
+      Navigator.of(context).pop();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _enviando = false);
+    }
   }
 
   @override
@@ -58,7 +136,7 @@ class _EmisionScreenState extends State<EmisionScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: _enviando ? null : () => Navigator.of(context).pop(),
         ),
         title: const Text('Reportar Desaparición'),
       ),
@@ -68,12 +146,13 @@ class _EmisionScreenState extends State<EmisionScreen> {
           padding: const EdgeInsets.all(CentinelaSpacing.lg),
           children: [
             _UploadPhotoArea(
-              seleccionada: _fotoSeleccionada,
-              onTap: _simularFoto,
+              fotoBytes: _fotoBytes,
+              onTap: _enviando ? null : _mostrarOpcionesFoto,
             ),
             const SizedBox(height: CentinelaSpacing.lg),
             TextFormField(
               controller: _nombreController,
+              enabled: !_enviando,
               decoration: const InputDecoration(labelText: 'Nombre completo'),
               textCapitalization: TextCapitalization.words,
               validator: (v) =>
@@ -82,6 +161,7 @@ class _EmisionScreenState extends State<EmisionScreen> {
             const SizedBox(height: CentinelaSpacing.md),
             TextFormField(
               controller: _edadController,
+              enabled: !_enviando,
               decoration: const InputDecoration(labelText: 'Edad aproximada'),
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -95,6 +175,7 @@ class _EmisionScreenState extends State<EmisionScreen> {
             const SizedBox(height: CentinelaSpacing.md),
             TextFormField(
               controller: _vestimentaController,
+              enabled: !_enviando,
               decoration: const InputDecoration(
                 labelText: 'Vestimenta o rasgo particular',
                 hintText: 'Ej: Camiseta roja, cicatriz en el brazo',
@@ -111,33 +192,28 @@ class _EmisionScreenState extends State<EmisionScreen> {
             const SizedBox(height: CentinelaSpacing.sm),
             Container(
               height: 140,
+              padding: const EdgeInsets.all(CentinelaSpacing.md),
               decoration: BoxDecoration(
                 color: CentinelaColors.border.withValues(alpha: 0.35),
                 borderRadius: BorderRadius.circular(CentinelaSpacing.radiusMd),
                 border: Border.all(color: CentinelaColors.border),
               ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Icon(Icons.map_outlined, size: 48, color: CentinelaColors.textSecondary.withValues(alpha: 0.5)),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      const Icon(Icons.location_on, color: CentinelaColors.alertCritical, size: 28),
-                      Padding(
-                        padding: const EdgeInsets.all(CentinelaSpacing.sm),
-                        child: Text(
-                          'GPS detectado · Arrastra el pin si es necesario',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: CentinelaColors.textSecondary,
-                          ),
+              child: _ubicacion == null
+                  ? const Center(child: Text('Obteniendo GPS…'))
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.location_on, color: CentinelaColors.alertCritical, size: 32),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Lat ${_ubicacion!.latitude.toStringAsFixed(5)}, '
+                          'Lng ${_ubicacion!.longitude.toStringAsFixed(5)}',
                           textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.bodySmall,
                         ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                        TextButton(onPressed: _cargarUbicacion, child: const Text('Actualizar GPS')),
+                      ],
+                    ),
             ),
             const SizedBox(height: 100),
           ],
@@ -147,8 +223,14 @@ class _EmisionScreenState extends State<EmisionScreen> {
         child: Padding(
           padding: const EdgeInsets.all(CentinelaSpacing.md),
           child: FilledButton(
-            onPressed: _enviar,
-            child: const Text('ENVIAR ALERTA A LA COMUNIDAD'),
+            onPressed: _enviando ? null : _enviar,
+            child: _enviando
+                ? const SizedBox(
+                    height: 22,
+                    width: 22,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                  )
+                : const Text('ENVIAR ALERTA A LA COMUNIDAD'),
           ),
         ),
       ),
@@ -157,10 +239,10 @@ class _EmisionScreenState extends State<EmisionScreen> {
 }
 
 class _UploadPhotoArea extends StatelessWidget {
-  const _UploadPhotoArea({required this.seleccionada, required this.onTap});
+  const _UploadPhotoArea({required this.fotoBytes, required this.onTap});
 
-  final bool seleccionada;
-  final VoidCallback onTap;
+  final Uint8List? fotoBytes;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -171,25 +253,15 @@ class _UploadPhotoArea extends StatelessWidget {
         height: 180,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: seleccionada
-              ? CentinelaColors.community.withValues(alpha: 0.08)
-              : CentinelaColors.surface,
+          color: CentinelaColors.surface,
           borderRadius: BorderRadius.circular(CentinelaSpacing.radiusLg),
-          border: Border.all(
-            color: seleccionada ? CentinelaColors.community : CentinelaColors.border,
-            width: seleccionada ? 2 : 1.5,
-          ),
+          border: Border.all(color: CentinelaColors.border, width: 1.5),
+          image: fotoBytes != null
+              ? DecorationImage(image: MemoryImage(fotoBytes!), fit: BoxFit.cover)
+              : null,
         ),
-        child: seleccionada
+        child: fotoBytes == null
             ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.check_circle, size: 48, color: CentinelaColors.community),
-                  const SizedBox(height: 8),
-                  Text('Fotografía lista', style: Theme.of(context).textTheme.titleSmall),
-                ],
-              )
-            : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.add_a_photo_outlined, size: 48, color: CentinelaColors.textSecondary),
@@ -204,7 +276,8 @@ class _UploadPhotoArea extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                 ],
-              ),
+              )
+            : null,
       ),
     );
   }

@@ -37,7 +37,7 @@ Plataforma móvil de alertas comunitarias hiperlocales para reportes de personas
 | Flutter — proyecto base | ✅ |
 | Sprint 0 — conexión Supabase | ✅ Validado en emulador Pixel 9 |
 | Sprint 1 — UI wireframes (mock) | ✅ Home, Emisión, Detalle |
-| Sprint 2 — lógica + backend | ⏳ Siguiente |
+| Sprint 2 — lógica + Supabase | ✅ Onboarding, fotos, alertas reales, mapa en vivo |
 | Notificaciones / WhatsApp | ⏳ Sprint 3 |
 
 ## Estructura del código
@@ -124,9 +124,16 @@ git push
 
 ## Próximo paso
 
-**Sprint 2 — Lógica core:** onboarding, permisos, subida de foto a Supabase Storage, insertar alertas reales y mapa con datos en vivo.
+**Sprint 3 — Geofencing y amplificación:** push notifications (FCM), deep links WhatsApp, botón «Lo vi».
+
+### Probar Sprint 2 en el emulador
+
+1. Al abrir la app verás **Onboarding** (permisos GPS y notificaciones).
+2. En el emulador Pixel 9: **⋯ → Location** → fija coordenadas de Jipijapa (`-1.0, -80.58`) para que el GPS funcione.
+3. Pulsa **EMITIR ALERTA** → sube foto → envía → debe aparecer en el mapa y en la lista.
 
 ### Hitos completados
 
 - **2025-06-25:** Sprint 0 cerrado — app Flutter ↔ Supabase `centinela-mvp` en emulador Android.
-- **2025-06-26:** Sprint 1 cerrado — 3 pantallas Figma con mock data (mapa OSM, bottom sheet, formulario, detalle).
+- **2025-06-26:** Sprint 1 cerrado — 3 pantallas Figma con mock data.
+- **2025-06-26:** Sprint 2 cerrado — alertas reales, Storage, onboarding y realtime.

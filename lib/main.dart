@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'config/app_env.dart';
 import 'services/supabase_service.dart';
-import 'ui/screens/home_screen.dart';
+import 'ui/screens/bootstrap_screen.dart';
 import 'ui/theme/centinela_theme.dart';
 
 Future<void> main() async {
@@ -21,7 +21,7 @@ class CentinelaApp extends StatelessWidget {
       title: 'Centinela',
       debugShowCheckedModeBanner: false,
       theme: buildCentinelaTheme(),
-      home: const HomeScreen(),
+      home: const BootstrapScreen(),
     );
   }
 }

@@ -1,16 +1,19 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../data/mock_alertas.dart';
 import '../../models/alerta_desaparecido.dart';
+import '../../services/alerta_service.dart';
+import '../../services/location_service.dart';
 import '../theme/centinela_theme.dart';
 import '../widgets/alerta_card.dart';
 import '../widgets/emitir_alerta_fab.dart';
-import 'emision_screen.dart';
 import 'detalle_alerta_screen.dart';
+import 'emision_screen.dart';
 
-/// Pantalla 1 — Mapa principal + bottom sheet + FAB (Sprint 1, mock data).
+/// Pantalla 1 — Mapa + bottom sheet con datos en vivo de Supabase (Sprint 2).
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -20,11 +23,80 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final _mapController = MapController();
-  final _alertas = MockAlertas.alertas;
+  LatLng? _userPosition;
+  List<AlertaDesaparecido> _alertas = [];
+  String? _error;
+  bool _loading = true;
+  StreamSubscription<List<AlertaDesaparecido>>? _alertasSub;
+
+  @override
+  void initState() {
+    super.initState();
+    _initLocation();
+  }
+
+  @override
+  void dispose() {
+    _alertasSub?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _initLocation() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+
+    try {
+      final pos = await LocationService.getCurrentPosition();
+      final centro = pos != null
+          ? LatLng(pos.latitude, pos.longitude)
+          : const LatLng(-1.0, -80.5833);
+
+      if (pos != null) {
+        await LocationService.syncUbicacionToSupabase();
+      }
+
+      final alertas = await AlertaService.fetchActivas(
+        userLat: centro.latitude,
+        userLng: centro.longitude,
+      );
+
+      if (!mounted) return;
+      setState(() {
+        _userPosition = centro;
+        _alertas = alertas;
+        _loading = false;
+      });
+
+      _subscribeRealtime(centro);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = e.toString();
+        _loading = false;
+      });
+    }
+  }
+
+  void _subscribeRealtime(LatLng centro) {
+    _alertasSub?.cancel();
+    _alertasSub = AlertaService.watchActivas(
+      userLat: centro.latitude,
+      userLng: centro.longitude,
+    ).listen(
+      (alertas) {
+        if (mounted) setState(() => _alertas = alertas);
+      },
+      onError: (Object e) {
+        if (mounted) setState(() => _error = e.toString());
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final centro = LatLng(MockAlertas.centroLat, MockAlertas.centroLng);
+    final centro = _userPosition ?? const LatLng(-1.0, -80.5833);
 
     return Scaffold(
       body: Stack(
@@ -68,6 +140,13 @@ class _HomeScreenState extends State<HomeScreen> {
               child: AppBar(
                 title: const Text('Centinela'),
                 backgroundColor: CentinelaColors.surface.withValues(alpha: 0.92),
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.refresh),
+                    tooltip: 'Actualizar',
+                    onPressed: _initLocation,
+                  ),
+                ],
               ),
             ),
           ),
@@ -88,67 +167,93 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 12),
-                    Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: CentinelaColors.border,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-                      child: Row(
-                        children: [
-                          Text(
-                            'Alertas activas',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const Spacer(),
-                          Text(
-                            '${_alertas.length} cerca',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: CentinelaColors.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: ListView.separated(
-                        controller: scrollController,
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
-                        itemCount: _alertas.length,
-                        separatorBuilder: (_, _) => const SizedBox(height: 12),
-                        itemBuilder: (context, index) {
-                          final alerta = _alertas[index];
-                          return AlertaCard(
-                            alerta: alerta,
-                            onTap: () => _openDetalle(alerta),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
+                child: _buildSheetContent(context, scrollController),
               );
             },
           ),
         ],
       ),
       floatingActionButton: EmitirAlertaFab(
-        onPressed: () {
-          Navigator.of(context).push(
+        onPressed: () async {
+          await Navigator.of(context).push(
             MaterialPageRoute<void>(builder: (_) => const EmisionScreen()),
           );
+          await _initLocation();
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+    );
+  }
+
+  Widget _buildSheetContent(BuildContext context, ScrollController scrollController) {
+    if (_loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_error != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Text('Error: $_error', textAlign: TextAlign.center),
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        const SizedBox(height: 12),
+        Container(
+          width: 40,
+          height: 4,
+          decoration: BoxDecoration(
+            color: CentinelaColors.border,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+          child: Row(
+            children: [
+              Text(
+                'Alertas activas',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '${_alertas.length} cerca',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: CentinelaColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: _alertas.isEmpty
+              ? Center(
+                  child: Text(
+                    'No hay alertas activas en tu zona.',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: CentinelaColors.textSecondary,
+                    ),
+                  ),
+                )
+              : ListView.separated(
+                  controller: scrollController,
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+                  itemCount: _alertas.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    final alerta = _alertas[index];
+                    return AlertaCard(
+                      alerta: alerta,
+                      onTap: () => _openDetalle(alerta),
+                    );
+                  },
+                ),
+        ),
+      ],
     );
   }
 

@@ -25,7 +25,7 @@ class AlertaCard extends StatelessWidget {
           padding: const EdgeInsets.all(CentinelaSpacing.md),
           child: Row(
             children: [
-              _FotoPlaceholder(nombre: alerta.nombrePersona),
+              _FotoThumbnail(fotoUrl: alerta.fotoUrl, nombre: alerta.nombrePersona),
               const SizedBox(width: CentinelaSpacing.md),
               Expanded(
                 child: Column(
@@ -66,14 +66,35 @@ class AlertaCard extends StatelessWidget {
   }
 }
 
-class _FotoPlaceholder extends StatelessWidget {
-  const _FotoPlaceholder({required this.nombre});
+class _FotoThumbnail extends StatelessWidget {
+  const _FotoThumbnail({required this.fotoUrl, required this.nombre});
 
+  final String fotoUrl;
   final String nombre;
 
   @override
   Widget build(BuildContext context) {
     final inicial = nombre.isNotEmpty ? nombre[0].toUpperCase() : '?';
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(CentinelaSpacing.radiusMd),
+      child: Image.network(
+        fotoUrl,
+        width: 72,
+        height: 72,
+        fit: BoxFit.cover,
+        errorBuilder: (_, _, _) => _FotoPlaceholder(inicial: inicial),
+      ),
+    );
+  }
+}
+
+class _FotoPlaceholder extends StatelessWidget {
+  const _FotoPlaceholder({required this.inicial});
+
+  final String inicial;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       width: 72,
       height: 72,
