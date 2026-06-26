@@ -35,8 +35,9 @@ Plataforma móvil de alertas comunitarias hiperlocales para reportes de personas
 | GitHub | ✅ [ProyectoCentinela](https://github.com/AxelJhostin/ProyectoCentinela) |
 | Supabase `centinela-mvp` | ✅ Tablas + RLS + PostGIS |
 | Flutter — proyecto base | ✅ |
-| Sprint 0 — conexión Supabase | ✅ Validado en emulador Pixel 9 (auth anónimo + upsert en `usuarios`) |
-| UI wireframes (Sprint 1) | ⏳ Siguiente |
+| Sprint 0 — conexión Supabase | ✅ Validado en emulador Pixel 9 |
+| Sprint 1 — UI wireframes (mock) | ✅ Home, Emisión, Detalle |
+| Sprint 2 — lógica + backend | ⏳ Siguiente |
 | Notificaciones / WhatsApp | ⏳ Sprint 3 |
 
 ## Estructura del código
@@ -123,8 +124,9 @@ git push
 
 ## Próximo paso
 
-**Sprint 1 — Maquetación visual (El Cascarón):** Home con mapa + bottom sheet + FAB, formulario de emisión y detalle de alerta según [Figma](https://www.figma.com/design/Mq5z1DCdmuwHq7kFBVnXP8/Proyecto-Centinela-%E2%80%94-Wireframes-MVP), usando mock data (sin lógica final aún).
+**Sprint 2 — Lógica core:** onboarding, permisos, subida de foto a Supabase Storage, insertar alertas reales y mapa con datos en vivo.
 
 ### Hitos completados
 
 - **2025-06-25:** Sprint 0 cerrado — app Flutter ↔ Supabase `centinela-mvp` en emulador Android.
+- **2025-06-26:** Sprint 1 cerrado — 3 pantallas Figma con mock data (mapa OSM, bottom sheet, formulario, detalle).
