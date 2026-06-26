@@ -170,58 +170,71 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     mapController: _mapController,
                     options: MapOptions(
                       initialCenter: centro,
-                      initialZoom: 14,
-                      backgroundColor: const Color(0xFFE8ECEF),
+                      initialZoom: 15,
+                      minZoom: 5,
+                      maxZoom: 19,
                       interactionOptions: const InteractionOptions(
                         flags: InteractiveFlag.all,
                       ),
                     ),
                     children: [
                       TileLayer(
-                        urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                        userAgentPackageName: 'com.axeljhostin.centinela.centinela',
+                        urlTemplate:
+                            'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+                        subdomains: const ['a', 'b', 'c', 'd'],
+                        userAgentPackageName:
+                            'com.axeljhostin.centinela.centinela',
                       ),
-                      MarkerLayer(
-                        markers: [
-                          ..._alertas.map(_markerForAlerta),
-                          Marker(
-                            point: centro,
-                            width: 48,
-                            height: 48,
-                            child: const Icon(
-                              Icons.my_location,
-                              color: CentinelaColors.community,
-                              size: 40,
+                      // Los marcadores no se tocan en Home; evita bloquear pan/zoom del mapa.
+                      IgnorePointer(
+                        child: MarkerLayer(
+                          markers: [
+                            ..._alertas.map(_markerForAlerta),
+                            Marker(
+                              point: centro,
+                              width: 48,
+                              height: 48,
+                              child: const Icon(
+                                Icons.my_location,
+                                color: CentinelaColors.community,
+                                size: 40,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
-                SafeArea(
-                  bottom: false,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: AppBar(
-                      title: const Text('Centinela'),
-                      backgroundColor: CentinelaColors.surface.withValues(alpha: 0.95),
-                      actions: [
-                        IconButton(
-                          icon: const Icon(Icons.refresh),
-                          tooltip: 'Actualizar',
-                          onPressed: _initLocation,
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.gavel_outlined),
-                          tooltip: 'Términos y privacidad',
-                          onPressed: () => Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (_) => const LegalTermsScreen(),
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: SafeArea(
+                    bottom: false,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: AppBar(
+                        title: const Text('Centinela'),
+                        backgroundColor:
+                            CentinelaColors.surface.withValues(alpha: 0.95),
+                        actions: [
+                          IconButton(
+                            icon: const Icon(Icons.refresh),
+                            tooltip: 'Actualizar',
+                            onPressed: _initLocation,
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.gavel_outlined),
+                            tooltip: 'Términos y privacidad',
+                            onPressed: () => Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) => const LegalTermsScreen(),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
