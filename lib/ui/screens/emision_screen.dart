@@ -7,6 +7,7 @@ import '../../services/alerta_service.dart';
 import '../../services/foto_service.dart';
 import '../../services/location_service.dart';
 import '../../services/push_service.dart';
+import '../../utils/user_facing_error.dart';
 import '../theme/centinela_spacing.dart';
 import '../theme/centinela_theme.dart';
 import '../widgets/ubicacion_pin_picker.dart';
@@ -137,7 +138,10 @@ class _EmisionScreenState extends State<EmisionScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
+        SnackBar(
+          content: Text(userFacingError(e)),
+          duration: const Duration(seconds: 5),
+        ),
       );
     } finally {
       if (mounted) setState(() => _enviando = false);

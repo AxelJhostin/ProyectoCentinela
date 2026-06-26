@@ -15,7 +15,7 @@ import 'detalle_alerta_screen.dart';
 import 'emision_screen.dart';
 import 'legal_terms_screen.dart';
 
-/// Pantalla 1 — Mapa + bottom sheet con datos en vivo de Supabase (Sprint 2).
+/// Pantalla 1 — Mapa + panel inferior con alertas activas (Sprint 2).
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -148,115 +148,136 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     });
   }
 
+  Future<void> _abrirEmision() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const EmisionScreen()),
+    );
+    await _initLocation();
+  }
+
   @override
   Widget build(BuildContext context) {
     final centro = _userPosition ?? const LatLng(-1.0, -80.5833);
 
     return Scaffold(
-      body: Stack(
+      body: Column(
         children: [
-          FlutterMap(
-            mapController: _mapController,
-            options: MapOptions(
-              initialCenter: centro,
-              initialZoom: 14,
-              interactionOptions: const InteractionOptions(
-                flags: InteractiveFlag.all,
-              ),
-            ),
-            children: [
-              TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'com.axeljhostin.centinela',
-              ),
-              MarkerLayer(
-                markers: [
-                  ..._alertas.map(_markerForAlerta),
-                  Marker(
-                    point: centro,
-                    width: 48,
-                    height: 48,
-                    child: const Icon(
-                      Icons.my_location,
-                      color: CentinelaColors.community,
-                      size: 40,
+          Expanded(
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: FlutterMap(
+                    mapController: _mapController,
+                    options: MapOptions(
+                      initialCenter: centro,
+                      initialZoom: 14,
+                      backgroundColor: const Color(0xFFE8ECEF),
+                      interactionOptions: const InteractionOptions(
+                        flags: InteractiveFlag.all,
+                      ),
                     ),
+                    children: [
+                      TileLayer(
+                        urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        userAgentPackageName: 'com.axeljhostin.centinela.centinela',
+                      ),
+                      MarkerLayer(
+                        markers: [
+                          ..._alertas.map(_markerForAlerta),
+                          Marker(
+                            point: centro,
+                            width: 48,
+                            height: 48,
+                            child: const Icon(
+                              Icons.my_location,
+                              color: CentinelaColors.community,
+                              size: 40,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ],
-          ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: AppBar(
-                title: const Text('Centinela'),
-                backgroundColor: CentinelaColors.surface.withValues(alpha: 0.92),
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.refresh),
-                    tooltip: 'Actualizar',
-                    onPressed: _initLocation,
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.gavel_outlined),
-                    tooltip: 'Términos y privacidad',
-                    onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute<void>(builder: (_) => const LegalTermsScreen()),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          DraggableScrollableSheet(
-            initialChildSize: 0.18,
-            minChildSize: 0.14,
-            maxChildSize: 0.55,
-            builder: (context, scrollController) {
-              return Container(
-                decoration: const BoxDecoration(
-                  color: CentinelaColors.surface,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 12,
-                      offset: Offset(0, -2),
-                    ),
-                  ],
                 ),
-                child: _buildSheetContent(context, scrollController),
-              );
-            },
-          ),
-          if (_userPosition != null)
-            Positioned(
-              right: 16,
-              bottom: 120,
-              child: FloatingActionButton.small(
-                heroTag: 'centro_mapa',
-                onPressed: () => _mapController.move(_userPosition!, 15),
-                backgroundColor: CentinelaColors.surface,
-                foregroundColor: CentinelaColors.community,
-                child: const Icon(Icons.my_location),
-              ),
+                SafeArea(
+                  bottom: false,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: AppBar(
+                      title: const Text('Centinela'),
+                      backgroundColor: CentinelaColors.surface.withValues(alpha: 0.95),
+                      actions: [
+                        IconButton(
+                          icon: const Icon(Icons.refresh),
+                          tooltip: 'Actualizar',
+                          onPressed: _initLocation,
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.gavel_outlined),
+                          tooltip: 'Términos y privacidad',
+                          onPressed: () => Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => const LegalTermsScreen(),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: 16,
+                  bottom: 16,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      if (_userPosition != null)
+                        FloatingActionButton.small(
+                          heroTag: 'centro_mapa',
+                          onPressed: () => _mapController.move(_userPosition!, 15),
+                          backgroundColor: CentinelaColors.surface,
+                          foregroundColor: CentinelaColors.community,
+                          elevation: 3,
+                          child: const Icon(Icons.my_location),
+                        ),
+                      const SizedBox(height: 12),
+                      EmitirAlertaFab(onPressed: _abrirEmision),
+                    ],
+                  ),
+                ),
+              ],
             ),
+          ),
+          _buildBottomPanel(context),
         ],
       ),
-      floatingActionButton: EmitirAlertaFab(
-        onPressed: () async {
-          await Navigator.of(context).push(
-            MaterialPageRoute<void>(builder: (_) => const EmisionScreen()),
-          );
-          await _initLocation();
-        },
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
-  Widget _buildSheetContent(BuildContext context, ScrollController scrollController) {
+  Widget _buildBottomPanel(BuildContext context) {
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.sizeOf(context).height * 0.32,
+        minHeight: 132,
+      ),
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        color: CentinelaColors.surface,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 12,
+            offset: Offset(0, -2),
+          ),
+        ],
+      ),
+      child: _buildSheetContent(context),
+    );
+  }
+
+  Widget _buildSheetContent(BuildContext context) {
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -271,7 +292,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     return Column(
       children: [
-        const SizedBox(height: 12),
+        const SizedBox(height: 10),
         Container(
           width: 40,
           height: 4,
@@ -281,7 +302,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
           child: Row(
             children: [
               Text(
@@ -311,8 +332,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ),
                 )
               : ListView.separated(
-                  controller: scrollController,
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
                   itemCount: _alertas.length,
                   separatorBuilder: (_, _) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
