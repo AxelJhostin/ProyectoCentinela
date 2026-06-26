@@ -22,7 +22,7 @@ Plataforma móvil de alertas comunitarias hiperlocales para reportes de personas
 
 | Capa | Tecnología |
 |------|------------|
-| App móvil | Flutter 3.x (Android piloto; iOS secundario) |
+| App móvil | Flutter 3.x (Android piloto; Web para pruebas; iOS secundario) |
 | Backend / BD | Supabase `centinela-mvp` (PostgreSQL + PostGIS) |
 | Push | Firebase Cloud Messaging (Sprint 3) |
 | Deep links | Vercel (Sprint 3) |
@@ -75,11 +75,22 @@ flutter pub get
 
 ## Ejecutar la app
 
+Guía completa (Chrome, emulador, teléfono): [Documentos/Ejecutar-App-Dispositivos.md](Documentos/Ejecutar-App-Dispositivos.md)
+
+### Prueba rápida en Chrome (Sprint 0)
+
 ```bash
-flutter run
+flutter run -d chrome
 ```
 
-En la pantalla inicial, pulsa **「Probar conexión Supabase」** para validar Sprint 0 (Tarea 0.4).
+### Android (piloto)
+
+```bash
+# 1. Enciende emulador en Android Studio (Device Manager → Play en Pixel 9)
+#    O conecta tu teléfono con depuración USB
+flutter devices
+flutter run
+```
 
 ### Requisitos de desarrollo
 
