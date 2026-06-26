@@ -43,24 +43,23 @@ El esquema SQL inicial está en `supabase/migrations/`.
 | Arquitectura / SDD | Documentado |
 | Diseño UI (Figma) | 3 pantallas core + design system |
 | Git local | Commit inicial hecho |
-| GitHub remoto | **Pendiente** — ver abajo |
+| GitHub remoto | [AxelJhostin/ProyectoCentinela](https://github.com/AxelJhostin/ProyectoCentinela) |
 | Implementación Flutter | Pendiente (Sprint 0) |
 | Supabase | Sin crear aún |
 
-## GitHub (siguiente paso tuyo, ~5 min)
+## GitHub
 
-Instalamos `gh` en tu Mac. Falta **vincular tu cuenta** y crear el repo:
+Repositorio: **https://github.com/AxelJhostin/ProyectoCentinela**
+
+Para subir cambios futuros:
 
 ```bash
-# 1. Iniciar sesión (solo una vez; sigue el asistente en la terminal)
-gh auth login
-
-# 2. Crear repo privado y subir el código
-cd /Users/hernandezaxel/proyectos/ProyectoEmilia
-./scripts/setup-github.sh
+git add .
+git commit -m "Descripción del cambio"
+git push
 ```
 
-Guía detallada con alternativa manual: [Documentos/Sprint-0-Guia-Paso-a-Paso.md](Documentos/Sprint-0-Guia-Paso-a-Paso.md)
+Guía Sprint 0 completa: [Documentos/Sprint-0-Guia-Paso-a-Paso.md](Documentos/Sprint-0-Guia-Paso-a-Paso.md)
 
 ## Próximo paso técnico
 
