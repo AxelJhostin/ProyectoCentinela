@@ -18,6 +18,7 @@ Plataforma móvil de alertas comunitarias hiperlocales para reportes de personas
 | [Firebase FCM](Documentos/Firebase-Setup.md) | Configurar push notifications |
 | [Piloto Jipijapa](Documentos/Sprint-4-Checklist-Piloto.md) | Checklist y métricas Sprint 4 |
 | [**Sprint 5 — Fixes piloto**](Documentos/Sprint-5-Backlog-Fixes-Piloto.md) | Correcciones post-prueba Alfa |
+| [**Sprint 5.2 — Firebase FCM**](Documentos/Sprint-5.2-Firebase-FCM.md) | Push comunitario y al emisor |
 | [Próxima sesión](Documentos/Proxima-Sesion.md) | Estado actual y qué hacer |
 
 ## Diseño
@@ -30,7 +31,7 @@ Plataforma móvil de alertas comunitarias hiperlocales para reportes de personas
 |------|------------|
 | App móvil | Flutter 3.x (Android piloto; Web para pruebas; iOS secundario) |
 | Backend / BD | Supabase `centinela-mvp` (PostgreSQL + PostGIS) |
-| Push | Firebase Cloud Messaging + Edge Function `dispatch-alert-push` |
+| Push | Firebase Cloud Messaging + Edge Functions `dispatch-alert-push`, `dispatch-avistamiento-push` |
 | Deep links / OG | `centinela://alerta` + Edge Function `alerta-preview` |
 
 ## Estado del proyecto
@@ -45,7 +46,7 @@ Plataforma móvil de alertas comunitarias hiperlocales para reportes de personas
 | Sprint 2 — backend en app | ✅ |
 | Sprint 3 — geofencing y amplificación | ✅ |
 | Sprint 4 — legal, QA, piloto | ✅ Prueba Alfa realizada |
-| Sprint 5 — fixes piloto | ✅ 5.1 WhatsApp/mapa/Lo vi · ⏳ 5.2 Firebase push |
+| Sprint 5 — fixes piloto | ✅ 5.1 WhatsApp/mapa/Lo vi · ✅ 5.2 Firebase FCM (código) |
 
 ## Sprint 5 — entregables (post-prueba Alfa)
 
@@ -54,7 +55,8 @@ Plataforma móvil de alertas comunitarias hiperlocales para reportes de personas
 - **Emisión** con pin en mapa + texto «Último lugar visto»
 - **Lo vi** con pantalla para marcar dónde
 - **Realtime** avistamientos + resumen para emisor
-- **Pendiente 5.2:** Firebase FCM para push con app cerrada
+- **Firebase FCM (5.2):** tokens, push comunitario, push emisor en «Lo vi», tap abre alerta
+- **Manual:** `google-services.json` + secret `FIREBASE_SERVICE_ACCOUNT` en Supabase → ver [Firebase-Setup.md](Documentos/Firebase-Setup.md)
 
 ## Sprint 4 — entregables
 
@@ -71,7 +73,7 @@ Plataforma móvil de alertas comunitarias hiperlocales para reportes de personas
 - **Deep links** `centinela://alerta?id=…`
 - **Post-moderación**: reportar falsa, límites cuentas nuevas, `score_confiabilidad`
 - Sync de ubicación cada 3 min + al volver a la app
-- Edge Function **dispatch-alert-push** (requiere `FCM_SERVER_KEY`)
+- Edge Functions **dispatch-alert-push** y **dispatch-avistamiento-push** (requieren `FIREBASE_SERVICE_ACCOUNT` o `FCM_SERVER_KEY`)
 
 ## Estructura del código
 
@@ -85,7 +87,7 @@ lib/
 └── ui/theme/
 supabase/
 ├── migrations/
-└── functions/       # alerta-preview, dispatch-alert-push
+└── functions/       # alerta-preview, dispatch-alert-push, dispatch-avistamiento-push, _shared/fcm.ts
 env/app.env          # Claves locales (NO subir a GitHub)
 ```
 

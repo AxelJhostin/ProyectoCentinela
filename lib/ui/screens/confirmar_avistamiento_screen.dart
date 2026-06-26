@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../services/avistamiento_service.dart';
+import '../../services/push_service.dart';
 import '../../services/location_service.dart';
 import '../theme/centinela_spacing.dart';
 import '../theme/centinela_theme.dart';
@@ -38,6 +39,7 @@ class _ConfirmarAvistamientoScreenState extends State<ConfirmarAvistamientoScree
         lat: _ubicacion!.latitude,
         lng: _ubicacion!.longitude,
       );
+      await PushService.notificarEmisorAvistamiento(widget.alertaId);
       if (!mounted) return;
       Navigator.of(context).pop(true);
     } catch (e) {

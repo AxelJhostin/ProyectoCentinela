@@ -2,8 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import 'supabase_service.dart';
 
-/// Invoca la Edge Function que envía push FCM a usuarios en radio (Sprint 3).
-/// Requiere FCM_SERVER_KEY en Supabase Secrets y tokens en usuarios.fcm_token.
+/// Invoca Edge Functions FCM (Sprint 5.2).
 class PushService {
   PushService._();
 
@@ -15,7 +14,7 @@ class PushService {
     int radioKm = 5,
   }) async {
     try {
-      await SupabaseService.client.functions.invoke(
+      final res = await SupabaseService.client.functions.invoke(
         'dispatch-alert-push',
         body: {
           'alerta_id': alertaId,
@@ -25,8 +24,21 @@ class PushService {
           'nombre_persona': nombrePersona,
         },
       );
+      debugPrint('Push comunidad: ${res.data}');
     } catch (e) {
-      debugPrint('Push no enviado (FCM puede no estar configurado): $e');
+      debugPrint('Push comunidad no enviado: $e');
+    }
+  }
+
+  static Future<void> notificarEmisorAvistamiento(String alertaId) async {
+    try {
+      final res = await SupabaseService.client.functions.invoke(
+        'dispatch-avistamiento-push',
+        body: {'alerta_id': alertaId},
+      );
+      debugPrint('Push emisor avistamiento: ${res.data}');
+    } catch (e) {
+      debugPrint('Push emisor no enviado: $e');
     }
   }
 }

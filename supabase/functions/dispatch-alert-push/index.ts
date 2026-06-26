@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { sendFcm } from "../_shared/fcm.ts";
 
 interface DispatchBody {
   alerta_id: string;
@@ -14,12 +15,11 @@ Deno.serve(async (req: Request) => {
     return json({ error: "Method not allowed" }, 405);
   }
 
-  const fcmKey = Deno.env.get("FCM_SERVER_KEY");
-  if (!fcmKey) {
+  if (!Deno.env.get("FIREBASE_SERVICE_ACCOUNT") && !Deno.env.get("FCM_SERVER_KEY")) {
     return json({
       ok: false,
       sent: 0,
-      message: "FCM_SERVER_KEY no configurada en Supabase Secrets",
+      message: "Configura FIREBASE_SERVICE_ACCOUNT o FCM_SERVER_KEY en Supabase Secrets",
     });
   }
 
@@ -32,10 +32,17 @@ Deno.serve(async (req: Request) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
 
+  const { data: alerta } = await supabase
+    .from("alertas_desaparecidos")
+    .select("emisor_id")
+    .eq("id", body.alerta_id)
+    .maybeSingle();
+
   const { data: usuarios, error } = await supabase.rpc("usuarios_en_radio", {
     origen_lat: body.lat,
     origen_lng: body.lng,
     radio_metros: radioMetros,
+    p_excluir_usuario_id: alerta?.emisor_id ?? null,
   });
 
   if (error) {
@@ -47,27 +54,13 @@ Deno.serve(async (req: Request) => {
     const token = row.fcm_token as string | null;
     if (!token) continue;
 
-    const res = await fetch("https://fcm.googleapis.com/fcm/send", {
-      method: "POST",
-      headers: {
-        Authorization: `key=${fcmKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        to: token,
-        priority: "high",
-        notification: {
-          title: "⚠️ Alerta de desaparición cerca de ti",
-          body: `Buscamos a ${body.nombre_persona}. Toca para ver detalles.`,
-        },
-        data: {
-          alerta_id: body.alerta_id,
-          click_action: "FLUTTER_NOTIFICATION_CLICK",
-        },
-      }),
-    });
-
-    if (res.ok) sent += 1;
+    const ok = await sendFcm(
+      token,
+      "⚠️ Alerta de desaparición cerca de ti",
+      `Buscamos a ${body.nombre_persona}. Toca para ver detalles.`,
+      { alerta_id: body.alerta_id, tipo: "alerta_nueva" },
+    );
+    if (ok) sent += 1;
   }
 
   return json({ ok: true, sent, total: usuarios?.length ?? 0 });

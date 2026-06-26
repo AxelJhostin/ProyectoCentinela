@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 import 'config/app_env.dart';
@@ -11,6 +12,7 @@ final navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   await AppEnv.load();
   await SupabaseService.initialize();
   runApp(const CentinelaApp());
@@ -31,7 +33,7 @@ class CentinelaApp extends StatelessWidget {
   }
 }
 
-/// Inicializa servicios de Sprint 3 tras el arranque (deep links + FCM stub).
+/// Inicializa deep links + FCM tras auth (Sprint 5.2).
 Future<void> initSprint3Services() async {
   await FcmService.init();
   await DeepLinkService.init(navigatorKey);
