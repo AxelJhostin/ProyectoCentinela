@@ -164,7 +164,7 @@ class _DetalleAlertaScreenState extends State<DetalleAlertaScreen> {
                 Text('Edad aproximada: ${alerta.edadAprox} años'),
                 const SizedBox(height: 4),
                 Text(
-                  'A ${alerta.distanciaKm.toStringAsFixed(1)} km de tu ubicación',
+                  alerta.distanciaTexto,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: CentinelaColors.community,
                     fontWeight: FontWeight.w500,

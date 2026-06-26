@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/alerta_desaparecido.dart';
+import 'location_service.dart';
 import 'supabase_service.dart';
 
 /// CRUD de alertas contra Supabase (Sprint 2).
@@ -26,6 +27,12 @@ class AlertaService {
     double? userLat,
     double? userLng,
   }) async {
+    final pos = await LocationService.getCurrentPosition();
+    if (pos != null) {
+      userLat = pos.latitude;
+      userLng = pos.longitude;
+    }
+
     final rows = await _client.from('v_alertas_activas').select();
     final list = (rows as List).cast<Map<String, dynamic>>();
     final alertas = list

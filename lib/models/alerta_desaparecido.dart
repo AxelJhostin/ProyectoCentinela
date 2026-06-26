@@ -1,5 +1,7 @@
 import 'package:latlong2/latlong.dart';
 
+import '../utils/distancia_formato.dart';
+
 /// Alerta de persona desaparecida (modelo de dominio MVP).
 class AlertaDesaparecido {
   const AlertaDesaparecido({
@@ -32,7 +34,7 @@ class AlertaDesaparecido {
   final int radioKm;
   final DateTime creadoEn;
 
-  String get distanciaTexto => 'A ${distanciaKm.toStringAsFixed(1)} km de ti';
+  String get distanciaTexto => DistanciaFormato.desdeUsuario(distanciaKm);
 
   String get tiempoTexto {
     if (minutosReportada < 1) return 'Alerta activa · Hace un momento';
