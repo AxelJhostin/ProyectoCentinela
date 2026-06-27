@@ -14,6 +14,8 @@ import '../theme/centinela_spacing.dart';
 import '../theme/centinela_theme.dart';
 import '../widgets/avistamiento_mapa_dialog.dart';
 import '../widgets/centinela_action_button.dart';
+import '../widgets/centinela_chip.dart';
+import '../widgets/centinela_section_card.dart';
 import 'confirmar_avistamiento_screen.dart';
 
 /// Pantalla 3 — Detalle de alerta (Sprint 2: foto real + resolver si eres emisor).
@@ -175,39 +177,35 @@ class _DetalleAlertaScreenState extends State<DetalleAlertaScreen> {
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-                const SizedBox(height: 8),
-                Text('Edad aproximada: ${alerta.edadAprox} años'),
-                const SizedBox(height: 4),
-                Text(
-                  alerta.distanciaTexto,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: CentinelaColors.community,
-                    fontWeight: FontWeight.w500,
-                  ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    CentinelaChip(
+                      label: '${alerta.edadAprox} años aprox.',
+                      icon: Icons.person_outline,
+                      color: CentinelaColors.textSecondary,
+                      filled: false,
+                    ),
+                    CentinelaChip(
+                      label: alerta.distanciaTexto,
+                      icon: Icons.near_me_outlined,
+                    ),
+                    CentinelaChip(
+                      label: alerta.tiempoTexto,
+                      icon: Icons.schedule,
+                      color: CentinelaColors.textSecondary,
+                      filled: false,
+                    ),
+                  ],
                 ),
                 if (alerta.ultimaVistaTexto.isNotEmpty) ...[
                   const SizedBox(height: CentinelaSpacing.md),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(CentinelaSpacing.md),
-                    decoration: BoxDecoration(
-                      color: CentinelaColors.surface,
-                      borderRadius: BorderRadius.circular(CentinelaSpacing.radiusMd),
-                      border: Border.all(color: CentinelaColors.border),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Último lugar visto',
-                          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                            color: CentinelaColors.textSecondary,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(alerta.ultimaVistaTexto),
-                      ],
-                    ),
+                  CentinelaSectionCard(
+                    title: 'Último lugar visto',
+                    body: alerta.ultimaVistaTexto,
+                    icon: Icons.place_outlined,
                   ),
                 ],
                 const SizedBox(height: CentinelaSpacing.lg),
@@ -218,27 +216,10 @@ class _DetalleAlertaScreenState extends State<DetalleAlertaScreen> {
                   ),
                 if (esEmisor) const SizedBox(height: CentinelaSpacing.lg),
                 if (alerta.vestimenta.isNotEmpty)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(CentinelaSpacing.md),
-                    decoration: BoxDecoration(
-                      color: CentinelaColors.surface,
-                      borderRadius: BorderRadius.circular(CentinelaSpacing.radiusMd),
-                      border: Border.all(color: CentinelaColors.border),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Vestimenta',
-                          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                            color: CentinelaColors.textSecondary,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(alerta.vestimenta),
-                      ],
-                    ),
+                  CentinelaSectionCard(
+                    title: 'Vestimenta',
+                    body: alerta.vestimenta,
+                    icon: Icons.checkroom_outlined,
                   ),
               ],
             ),
@@ -467,19 +448,47 @@ class _PhotoHero extends StatelessWidget {
     return Stack(
       children: [
         SizedBox(
-          height: 280,
+          height: 300,
           width: double.infinity,
-          child: Image.network(
-            alerta.fotoUrl,
-            fit: BoxFit.cover,
-            errorBuilder: (_, _, _) => Container(
-              color: CentinelaColors.alertCritical.withValues(alpha: 0.15),
-              child: const Icon(Icons.person, size: 80, color: CentinelaColors.alertCritical),
-            ),
-            loadingBuilder: (context, child, progress) {
-              if (progress == null) return child;
-              return const Center(child: CircularProgressIndicator());
-            },
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.network(
+                alerta.fotoUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => Container(
+                  color: CentinelaColors.alertCritical.withValues(alpha: 0.15),
+                  child: const Icon(Icons.person, size: 80, color: CentinelaColors.alertCritical),
+                ),
+                loadingBuilder: (context, child, progress) {
+                  if (progress == null) return child;
+                  return Container(
+                    color: CentinelaColors.border,
+                    child: const Center(
+                      child: CircularProgressIndicator(color: CentinelaColors.community),
+                    ),
+                  );
+                },
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: 100,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withValues(alpha: 0.55),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         SafeArea(

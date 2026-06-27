@@ -16,6 +16,11 @@ class CentinelaLogo extends StatelessWidget {
 
   static const tagline = 'Alertas de tu comunidad, cerca de ti.';
 
+  /// Logo horizontal para AppBar (Sprint 8).
+  static Widget compact({double iconSize = 32}) {
+    return CentinelaLogoCompact(iconSize: iconSize);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -50,6 +55,39 @@ class CentinelaLogo extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
         ],
+      ],
+    );
+  }
+}
+
+/// Marca compacta — icono + nombre para AppBar.
+class CentinelaLogoCompact extends StatelessWidget {
+  const CentinelaLogoCompact({super.key, this.iconSize = 32});
+
+  final double iconSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(iconSize * 0.22),
+          child: Image.asset(
+            'assets/brand/app_icon.png',
+            width: iconSize,
+            height: iconSize,
+            fit: BoxFit.cover,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          'Centinela',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w800,
+            color: CentinelaColors.textPrimary,
+          ),
+        ),
       ],
     );
   }

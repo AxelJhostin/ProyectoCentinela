@@ -103,7 +103,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               Material(
                 color: CentinelaColors.surface,
                 borderRadius: BorderRadius.circular(CentinelaSpacing.radiusMd),
-                child: CheckboxListTile(
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(CentinelaSpacing.radiusMd),
+                    border: Border.all(
+                      color: _legalAccepted
+                          ? CentinelaColors.community.withValues(alpha: 0.4)
+                          : CentinelaColors.border,
+                    ),
+                  ),
+                  child: CheckboxListTile(
                   value: _legalAccepted,
                   onChanged: _finishing
                       ? null
@@ -119,6 +128,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: const Text('Leer términos completos'),
                   ),
                   controlAffinity: ListTileControlAffinity.leading,
+                  ),
                 ),
               ),
               const Spacer(),
@@ -162,14 +172,46 @@ class _PermissionTile extends StatelessWidget {
     return Material(
       color: CentinelaColors.surface,
       borderRadius: BorderRadius.circular(CentinelaSpacing.radiusMd),
-      child: ListTile(
-        leading: Icon(icon, color: granted ? CentinelaColors.whatsApp : CentinelaColors.community),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-        subtitle: Text(subtitle),
-        trailing: granted
-            ? const Icon(Icons.check_circle, color: CentinelaColors.whatsApp)
-            : TextButton(onPressed: onTap, child: const Text('Permitir')),
-        onTap: granted ? null : onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(CentinelaSpacing.radiusMd),
+          border: Border.all(
+            color: granted
+                ? CentinelaColors.whatsApp.withValues(alpha: 0.4)
+                : CentinelaColors.border,
+          ),
+        ),
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          leading: Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: (granted ? CentinelaColors.whatsApp : CentinelaColors.community)
+                  .withValues(alpha: 0.12),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              color: granted ? CentinelaColors.whatsApp : CentinelaColors.community,
+            ),
+          ),
+          title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
+          subtitle: Text(subtitle),
+          trailing: granted
+              ? const Icon(Icons.check_circle, color: CentinelaColors.whatsApp)
+              : FilledButton.tonal(
+                  onPressed: onTap,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: CentinelaColors.community.withValues(alpha: 0.12),
+                    foregroundColor: CentinelaColors.community,
+                    minimumSize: const Size(0, 36),
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                  ),
+                  child: const Text('Permitir'),
+                ),
+          onTap: granted ? null : onTap,
+        ),
       ),
     );
   }

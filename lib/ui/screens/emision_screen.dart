@@ -12,6 +12,7 @@ import '../../services/share_service.dart';
 import '../../utils/user_facing_error.dart';
 import '../theme/centinela_spacing.dart';
 import '../theme/centinela_theme.dart';
+import '../widgets/centinela_section_card.dart';
 import '../widgets/ubicacion_pin_picker.dart';
 
 /// Pantalla 2 — Formulario exprés con foto real y guardado en Supabase (Sprint 2).
@@ -260,11 +261,10 @@ class _EmisionScreenState extends State<EmisionScreen> {
               maxLines: 2,
             ),
             const SizedBox(height: CentinelaSpacing.lg),
-            Text(
-              'Última ubicación vista',
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+            CentinelaSectionHeader(
+              title: 'Última ubicación vista',
+              subtitle: 'Describe el lugar y marca el punto en el mapa',
+              icon: Icons.place_outlined,
             ),
             const SizedBox(height: CentinelaSpacing.sm),
             TextFormField(
@@ -285,11 +285,10 @@ class _EmisionScreenState extends State<EmisionScreen> {
               onChanged: (sel) => setState(() => _ubicacionPin = sel.point),
             ),
             const SizedBox(height: CentinelaSpacing.lg),
-            Text(
-              'Radio de notificación',
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+            CentinelaSectionHeader(
+              title: 'Radio de notificación',
+              subtitle: 'A quién avisar en la comunidad',
+              icon: Icons.radar,
             ),
             const SizedBox(height: CentinelaSpacing.sm),
             SegmentedButton<int>(
@@ -340,16 +339,33 @@ class _UploadPhotoArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasPhoto = fotoBytes != null;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(CentinelaSpacing.radiusLg),
-      child: Container(
-        height: 180,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(CentinelaSpacing.radiusLg),
+        child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        height: hasPhoto ? 220 : 200,
         width: double.infinity,
         decoration: BoxDecoration(
           color: CentinelaColors.surface,
           borderRadius: BorderRadius.circular(CentinelaSpacing.radiusLg),
-          border: Border.all(color: CentinelaColors.border, width: 1.5),
+          border: Border.all(
+            color: hasPhoto ? CentinelaColors.community : CentinelaColors.border,
+            width: hasPhoto ? 2 : 1.5,
+          ),
+          boxShadow: hasPhoto
+              ? [
+                  BoxShadow(
+                    color: CentinelaColors.community.withValues(alpha: 0.12),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
           image: fotoBytes != null
               ? DecorationImage(image: MemoryImage(fotoBytes!), fit: BoxFit.cover)
               : null,
@@ -358,20 +374,40 @@ class _UploadPhotoArea extends StatelessWidget {
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.add_a_photo_outlined, size: 48, color: CentinelaColors.textSecondary),
-                  const SizedBox(height: 8),
-                  Text('Subir Fotografía', style: Theme.of(context).textTheme.titleSmall),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Toca para seleccionar · Se comprime automáticamente',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: CentinelaColors.textSecondary,
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: CentinelaColors.community.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
                     ),
-                    textAlign: TextAlign.center,
+                    child: const Icon(
+                      Icons.add_a_photo_outlined,
+                      size: 36,
+                      color: CentinelaColors.community,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Subir fotografía',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Text(
+                      'Toca para cámara o galería · Se comprime automáticamente',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: CentinelaColors.textSecondary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ],
               )
             : null,
+        ),
       ),
     );
   }

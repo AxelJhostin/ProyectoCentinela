@@ -10,8 +10,13 @@ import '../../services/avistamiento_service.dart';
 import '../../services/location_service.dart';
 import '../../services/share_service.dart';
 import '../../services/witness_guide_service.dart';
+import '../theme/centinela_spacing.dart';
 import '../theme/centinela_theme.dart';
 import '../widgets/alerta_card.dart';
+import '../widgets/centinela_chip.dart';
+import '../widgets/centinela_empty_state.dart';
+import '../widgets/centinela_logo.dart';
+import '../widgets/centinela_map_marker.dart';
 import '../widgets/emitir_alerta_fab.dart';
 import 'detalle_alerta_screen.dart';
 import 'emision_screen.dart';
@@ -196,13 +201,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           markers: [
                             Marker(
                               point: centro,
-                              width: 48,
-                              height: 48,
-                              child: const Icon(
-                                Icons.my_location,
-                                color: CentinelaColors.community,
-                                size: 40,
-                              ),
+                              width: 24,
+                              height: 24,
+                              child: const CentinelaUserMarker(),
                             ),
                           ],
                         ),
@@ -219,9 +220,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: AppBar(
-                        title: const Text('Centinela'),
+                        title: CentinelaLogo.compact(),
                         backgroundColor:
                             CentinelaColors.surface.withValues(alpha: 0.95),
+                        surfaceTintColor: Colors.transparent,
                         actions: [
                           IconButton(
                             icon: const Icon(Icons.refresh),
@@ -296,14 +298,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   Widget _buildSheetContent(BuildContext context) {
     if (_loading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(CentinelaSpacing.lg),
+          child: CircularProgressIndicator(color: CentinelaColors.community),
+        ),
+      );
     }
     if (_error != null) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Text('Error: $_error', textAlign: TextAlign.center),
-        ),
+      return CentinelaEmptyState(
+        icon: Icons.error_outline,
+        iconColor: CentinelaColors.alertCritical,
+        title: 'No pudimos cargar las alertas',
+        subtitle: 'Toca actualizar arriba para reintentar.',
       );
     }
 
@@ -319,34 +326,30 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
           child: Row(
             children: [
               Text(
                 'Alertas activas',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
               const Spacer(),
-              Text(
-                '${_alertas.length} cerca',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: CentinelaColors.textSecondary,
-                ),
+              CentinelaChip(
+                label: '${_alertas.length} cerca',
+                icon: Icons.radar,
               ),
             ],
           ),
         ),
         Expanded(
           child: _alertas.isEmpty
-              ? Center(
-                  child: Text(
-                    'No hay alertas activas en tu zona.',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: CentinelaColors.textSecondary,
-                    ),
-                  ),
+              ? const CentinelaEmptyState(
+                  title: 'Tu zona está tranquila por ahora',
+                  subtitle: 'No hay alertas activas cerca de ti. '
+                      'Si necesitas ayuda, usa el botón rojo del mapa.',
+                  icon: Icons.shield_outlined,
                 )
               : ListView.separated(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
@@ -369,15 +372,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Marker _markerForAlerta(AlertaDesaparecido alerta) {
     return Marker(
       point: LatLng(alerta.latitud, alerta.longitud),
-      width: 40,
-      height: 40,
+      width: 48,
+      height: 56,
       child: GestureDetector(
         onTap: () => _openDetalle(alerta),
-        child: const Icon(
-          Icons.location_on,
-          color: CentinelaColors.alertCritical,
-          size: 40,
-        ),
+        child: CentinelaMapMarker(photoUrl: alerta.fotoUrl),
       ),
     );
   }
