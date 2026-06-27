@@ -7,7 +7,7 @@ Objetivo: validar el MVP en condiciones reales antes del despliegue comunitario.
 ## Pre-requisitos
 
 - [ ] APK generado: `./scripts/build_apk.sh`
-- [ ] Firebase configurado ([Firebase-Setup.md](Firebase-Setup.md)) con `FCM_SERVER_KEY` en Supabase
+- [ ] Firebase configurado ([Firebase-Setup.md](../guias/Firebase-Setup.md)) con `FIREBASE_SERVICE_ACCOUNT` en Supabase
 - [ ] Consentimiento LOPDP aceptado en onboarding
 - [ ] Mínimo 3 dispositivos Android con GPS activo en Jipijapa
 
@@ -18,7 +18,7 @@ Objetivo: validar el MVP en condiciones reales antes del despliegue comunitario.
 | # | Escenario | Métrica objetivo | Resultado |
 |---|-----------|------------------|-----------|
 | 1 | Emisor completa reporte (foto + campos) | < 20 s en 4G (RF-01) | |
-| 2 | Push llega a dispositivos en radio 5 km | < 10 s (RF-02) | |
+| 2 | Push llega a dispositivos en radio configurado | < 10 s (RF-02) | |
 | 3 | Testigo pulsa «Lo vi» | Emisor ve contador sin teléfono expuesto (RF-03) | |
 | 4 | Compartir WhatsApp | OG con foto < 300 KB; enlace sin app (RF-04) | |
 | 5 | Marcar resuelto | Alerta oculta en mapa; OG = Caso resuelto | |

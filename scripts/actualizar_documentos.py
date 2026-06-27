@@ -88,14 +88,7 @@ def update_sdd() -> None:
         insert_block_after(
             wireframes,
             [
-                "Estado del diseño en Figma (Wireframes MVP): Pantallas 1–3 completadas (Home, Emisión, Detalle receptor). Design system base definido (colores, Inter).",
-                "Pantallas pendientes de diseño (prioridad antes de Sprint 2):",
-                "\t•\tPantalla 0 — Onboarding y permisos (GPS + notificaciones push).",
-                "\t•\tPantalla 0b — Login / Registro (Google, Apple, teléfono o email).",
-                "\t•\tPantalla 3b — Detalle de alerta (vista Emisor): botones Marcar como Resuelto y Reportar falsa alarma.",
-                "\t•\tPantalla 3c — Confirmación del flujo Lo vi (envío de coordenadas).",
-                "\t•\tPantalla Web — Deep Link público (alerta activa y caso resuelto con Open Graph).",
-                "\t•\tPantalla Legal — Términos y condiciones / consentimiento LOPDP.",
+                "Estado del diseño en Figma (Wireframes MVP): Pantallas principales implementadas en Flutter. Sprint 7 planificado: identidad visual (logo, icono, splash) más allá de wireframes funcionales.",
             ],
         )
 
@@ -169,6 +162,20 @@ def update_sprint_backlog() -> None:
             "Tarea 5.1: WhatsApp (manifest Android + intent), mapa Home usable, emisión con pin en mapa y texto de último lugar visto.",
             "Tarea 5.2: Lo vi con confirmación en mapa; Realtime en reacciones_avistamientos; resumen de avistamientos para emisor.",
             "Tarea 5.3: Firebase FCM para push con app cerrada (después de validar 5.1 en campo).",
+            "",
+            "Sprint 6: Cierre de ciclo (Post-piloto Beta)",
+            "Objetivo: feedback al emisor, radio configurable, UX testigo, Google Maps en avistamientos.",
+            "Tarea 6.1: Diálogo «Se notificó a N personas» tras emitir; sugerencia WhatsApp si nadie en radio.",
+            "Tarea 6.2: Radio configurable 10/30/50 km; push enriquecidos; dispatch-resuelto-push.",
+            "Tarea 6.3: Guía testigo, pines tocables en Home, compartir WhatsApp desde panel.",
+            "Tarea 6.4: Botón Abrir en Google Maps en mapa del avistamiento (punto «aquí la vi»).",
+            "",
+            "Sprint 7: Identidad visual (Planificado)",
+            "Objetivo: logo, icono adaptive Android, splash, onboarding con marca, guía de marca.",
+            "Tarea 7.1: Concepto de marca y tagline.",
+            "Tarea 7.2: Icono app + assets para notificaciones.",
+            "Tarea 7.3: Integración Flutter (launcher icons, splash, theme refinado).",
+            "Tarea 7.4: Preparación Play Store (firma release, política privacidad web).",
         ],
     )
 
