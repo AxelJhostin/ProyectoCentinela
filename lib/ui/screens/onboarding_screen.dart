@@ -6,6 +6,7 @@ import '../../services/location_service.dart';
 import '../../services/onboarding_service.dart';
 import '../theme/centinela_spacing.dart';
 import '../theme/centinela_theme.dart';
+import '../widgets/centinela_logo.dart';
 import 'home_screen.dart';
 import 'legal_terms_screen.dart';
 
@@ -68,19 +69,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Spacer(),
-              Icon(Icons.shield, size: 72, color: CentinelaColors.alertCritical),
+              const CentinelaLogo(),
               const SizedBox(height: CentinelaSpacing.lg),
               Text(
-                'Bienvenido a Centinela',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
                 'Para alertas hiperlocales necesitamos tu ubicación y '
-                'permiso para enviarte notificaciones críticas.',
+                'permiso para enviarte notificaciones.',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: CentinelaColors.textSecondary,
                 ),
@@ -102,7 +95,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 title: 'Notificaciones',
                 subtitle: _notificationGranted
                     ? 'Permiso concedido'
-                    : 'Para avisos de desaparición (Sprint 3: push)',
+                    : 'Para avisos de desaparición en tu zona',
                 granted: _notificationGranted,
                 onTap: _requestNotifications,
               ),

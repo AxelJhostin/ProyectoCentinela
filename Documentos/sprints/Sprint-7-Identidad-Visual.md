@@ -1,61 +1,30 @@
 # Sprint 7 — Identidad visual
 
-Objetivo: que Centinela se vea y se sienta como producto de confianza comunitaria, no como prototipo.
-
-**Estado:** planificado · **Prerequisito:** MVP funcional validado (Sprint 6 ✅)
+**Estado:** ✅ implementado (jun 2026)
 
 ---
 
 ## Entregables
 
-| ID | Entregable | Criterio de aceptación |
-|----|------------|------------------------|
-| 7.1 | Concepto de marca | Tagline + tono (1 página) |
-| 7.2 | Logo | Icono app + versión horizontal |
-| 7.3 | Icono Android | Adaptive icon (foreground + background) |
-| 7.4 | Splash screen | Logo al abrir la app |
-| 7.5 | Onboarding | Logo real (reemplazar `Icons.shield`) |
-| 7.6 | Guía de marca | Colores hex, tipografía, do/don't |
-| 7.7 | Theme Flutter | `centinela_theme.dart` alineado a marca |
+| ID | Entregable | Estado |
+|----|------------|--------|
+| 7.1 | Tagline: *Alertas de tu comunidad, cerca de ti.* | ✅ |
+| 7.2 | Logo + icono (ojo + pin, azul `#2563EB`) | ✅ |
+| 7.3 | Adaptive icon Android | ✅ |
+| 7.4 | Splash nativo | ✅ |
+| 7.5 | Onboarding con `CentinelaLogo` | ✅ |
+| 7.6 | [Guía de marca](../guias/Guia-Marca-Centinela.md) | ✅ |
+| 7.7 | Assets en `assets/brand/` | ✅ |
 
----
+## Regenerar tras cambiar PNG
 
-## Paleta base (refinar en Figma)
+```bash
+dart run flutter_launcher_icons
+dart run flutter_native_splash:create
+./scripts/build_apk.sh
+```
 
-| Token | Hex actual | Uso |
-|-------|------------|-----|
-| Alerta | `#DC2626` | Urgencia, emitir alerta |
-| Comunidad | `#2563EB` | Ayuda, Lo vi, mapa |
-| WhatsApp | `#25D366` | Compartir |
-| Fondo | `#F9FAFB` | Scaffold |
-| Texto | `#111827` / `#6B7280` | Primario / secundario |
+## Siguiente
 
-Tipografía: **Inter** (ya en app).
-
----
-
-## Tagline (elegir una)
-
-- *«Alertas de tu comunidad, cerca de ti.»*
-- *«Cuando desaparece alguien, tu barrio responde.»*
-- *«Centinela — tu comunidad alerta.»*
-
----
-
-## Checklist de implementación técnica
-
-- [ ] Assets en `assets/brand/` (logo SVG/PNG)
-- [ ] `flutter_launcher_icons` en `pubspec.yaml`
-- [ ] `flutter_native_splash` configurado
-- [ ] Actualizar `onboarding_screen.dart` con logo
-- [ ] Screenshots Play Store (post-marca)
-
----
-
-## Después del Sprint 7
-
-1. Página web mínima + política de privacidad URL  
-2. Play Store (testing cerrado Jipijapa)  
-3. Difusión comunitaria  
-
-Ver [Estado-Proyecto.md](../Estado-Proyecto.md)
+- Play Store + página web privacidad  
+- Difusión piloto Jipijapa  

@@ -8,7 +8,7 @@
 
 | Documento | Uso |
 |-----------|-----|
-| [**Estado del proyecto**](Estado-Proyecto.md) | Qué está hecho, qué sigue (Sprint 7 identidad visual) |
+| [**Estado del proyecto**](Estado-Proyecto.md) | Qué está hecho, qué sigue |
 
 ---
 
@@ -38,6 +38,7 @@ python3 scripts/actualizar_documentos.py
 | [Sprint 0 — Arranque](guias/Sprint-0-Guia-Paso-a-Paso.md) | Primer setup Git, Supabase, Flutter |
 | [Ejecutar en dispositivos](guias/Ejecutar-App-Dispositivos.md) | Android físico, emulador, web |
 | [Firebase FCM](guias/Firebase-Setup.md) | Push notifications, secrets, deploy functions |
+| [Guía de marca](guias/Guia-Marca-Centinela.md) | Logo, colores, tagline, assets |
 
 ---
 
@@ -48,7 +49,7 @@ python3 scripts/actualizar_documentos.py
 | 4 | [Checklist piloto Jipijapa](sprints/Sprint-4-Checklist-Piloto.md) |
 | 5 | [Fixes piloto + FCM](sprints/Sprint-5-Piloto-Fixes-FCM.md) |
 | 6 | [Cierre de ciclo](sprints/Sprint-6-Cierre-Ciclo.md) |
-| 7 | [Identidad visual](sprints/Sprint-7-Identidad-Visual.md) · **en curso** |
+| 7 | [Identidad visual](sprints/Sprint-7-Identidad-Visual.md) |
 
 ---
 

@@ -12,7 +12,15 @@ MVP **funcional** en piloto Jipijapa (Android): emitir alerta, push en radio, Lo
 
 **Siguiente:** Sprint 7 — identidad visual (logo, icono, splash).
 
-Detalle: [Documentos/Estado-Proyecto.md](Documentos/Estado-Proyecto.md)
+Detalle por sprint: [sprints/](sprints/).
+
+---
+
+## Sprint 7 — identidad visual
+
+- Tagline: *Alertas de tu comunidad, cerca de ti.*
+- Icono adaptive Android + splash + onboarding con logo
+- Guía: [Documentos/guias/Guia-Marca-Centinela.md](Documentos/guias/Guia-Marca-Centinela.md)
 
 ---
 

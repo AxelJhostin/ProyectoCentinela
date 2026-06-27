@@ -11,8 +11,8 @@
 | App Flutter (Android) | ✅ Flujo completo probado en campo |
 | Supabase + PostGIS + FCM | ✅ Producción piloto |
 | Piloto Alfa/Beta | ✅ Push, Lo vi, WhatsApp, mapa |
-| Identidad visual (logo, icono) | 🔄 **Sprint 7 — en curso** |
-| Play Store | ⬜ Después de marca + web privacidad |
+| Identidad visual (logo, icono, splash) | ✅ Sprint 7 |
+| Play Store | ⬜ Siguiente |
 
 ---
 
@@ -25,8 +25,9 @@
 | 4 | LOPDP, APK, checklist piloto |
 | 5 | Fixes Alfa, FCM, avistamientos enriquecidos |
 | 6 | Radio 10/30/50 km, feedback emisor, push resuelto, Google Maps en avistamientos |
+| 7 | Logo, icono adaptive, splash, onboarding, guía de marca |
 
-Detalle: [Sprint-7-Identidad-Visual.md](sprints/Sprint-7-Identidad-Visual.md)
+Detalle: [sprints/](sprints/) · Marca: [Guia-Marca-Centinela.md](guias/Guia-Marca-Centinela.md)
 
 ---
 
@@ -53,13 +54,11 @@ Instalar en Android: copiar el APK o `adb install -r build/app/outputs/flutter-a
 
 ---
 
-## Sprint 7 — Identidad visual (planificado)
+## Siguiente fase
 
-1. Logo + icono adaptive Android  
-2. Splash y onboarding con marca  
-3. Paleta refinada (mantener rojo alerta + azul comunidad)  
-4. Mini guía de marca  
-5. Después: Play Store + difusión Jipijapa  
+1. Página web + política de privacidad URL  
+2. Play Store (testing cerrado Jipijapa)  
+3. Difusión comunitaria  
 
 ---
 
