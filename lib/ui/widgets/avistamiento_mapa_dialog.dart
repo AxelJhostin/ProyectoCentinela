@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../services/maps_service.dart';
 import '../theme/centinela_spacing.dart';
 import '../theme/centinela_theme.dart';
 
@@ -12,17 +13,20 @@ class AvistamientoMapaDialog extends StatelessWidget {
     required this.origenAlerta,
     required this.puntoAvistamiento,
     required this.titulo,
+    this.etiquetaAvistamiento,
   });
 
   final LatLng origenAlerta;
   final LatLng puntoAvistamiento;
   final String titulo;
+  final String? etiquetaAvistamiento;
 
   static Future<void> show(
     BuildContext context, {
     required LatLng origenAlerta,
     required LatLng puntoAvistamiento,
     required String titulo,
+    String? etiquetaAvistamiento,
   }) {
     return showDialog<void>(
       context: context,
@@ -30,6 +34,7 @@ class AvistamientoMapaDialog extends StatelessWidget {
         origenAlerta: origenAlerta,
         puntoAvistamiento: puntoAvistamiento,
         titulo: titulo,
+        etiquetaAvistamiento: etiquetaAvistamiento,
       ),
     );
   }
@@ -49,6 +54,20 @@ class AvistamientoMapaDialog extends StatelessWidget {
     if (maxDelta > 0.2) return 10;
     if (maxDelta > 0.05) return 12;
     return 14;
+  }
+
+  Future<void> _abrirGoogleMaps(BuildContext context) async {
+    final ok = await MapsService.abrirAvistamiento(
+      lat: puntoAvistamiento.latitude,
+      lng: puntoAvistamiento.longitude,
+      etiqueta: etiquetaAvistamiento ?? 'Avistamiento Centinela',
+    );
+    if (!context.mounted) return;
+    if (!ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No se pudo abrir Google Maps')),
+      );
+    }
   }
 
   @override
@@ -80,7 +99,7 @@ class AvistamientoMapaDialog extends StatelessWidget {
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    'Azul: donde lo vieron',
+                    'Azul: donde lo vieron (punto para buscar)',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ),
@@ -142,6 +161,11 @@ class AvistamientoMapaDialog extends StatelessWidget {
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('Cerrar'),
+        ),
+        FilledButton.icon(
+          onPressed: () => _abrirGoogleMaps(context),
+          icon: const Icon(Icons.map, size: 20),
+          label: const Text('Abrir en Google Maps'),
         ),
       ],
     );

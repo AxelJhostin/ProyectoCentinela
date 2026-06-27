@@ -58,6 +58,7 @@ Plataforma móvil de alertas comunitarias hiperlocales para reportes de personas
 - **Guía testigo** única al entrar a Home
 - **Mapa Home:** pines de alerta tocables
 - **WhatsApp** desde tarjetas del panel inferior
+- **Google Maps en avistamientos:** el emisor abre en Maps el punto «aquí la vi» para ir a buscar (sin exponer al testigo)
 
 ## Sprint 5 — entregables (post-prueba Alfa)
 
@@ -92,7 +93,7 @@ Plataforma móvil de alertas comunitarias hiperlocales para reportes de personas
 lib/
 ├── config/
 ├── models/
-├── services/        # auth, alertas, avistamientos, fotos, push, share, deep links, legal…
+├── services/        # auth, alertas, avistamientos, fotos, push, share, maps, legal…
 ├── ui/screens/
 ├── ui/widgets/
 └── ui/theme/

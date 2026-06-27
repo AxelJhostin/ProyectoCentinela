@@ -437,6 +437,7 @@ class _AvistamientoResumenTile extends StatelessWidget {
                 origenAlerta: origenAlerta,
                 puntoAvistamiento: LatLng(resumen.lat, resumen.lng),
                 titulo: 'Mapa del avistamiento',
+                etiquetaAvistamiento: resumen.lugarDisplay,
               ),
               icon: const Icon(Icons.map_outlined, size: 18),
               label: const Text('Ver en mapa'),
