@@ -1,0 +1,85 @@
+---
+---
+
+<section class="public-stats card" aria-labelledby="stats-title" id="estadisticas">
+  <div class="stats-header">
+    <h2 id="stats-title" class="section-title">La comunidad ya se está moviendo</h2>
+    <p class="section-lead stats-lead">
+      Números reales del piloto en Manabí. Cada visita, descarga y compartido cuenta.
+    </p>
+  </div>
+  <div class="stats-grid" id="stats-grid">
+    <article class="stat-item">
+      <span class="stat-value" data-stat="visitas">—</span>
+      <span class="stat-label">Personas han visto esta página</span>
+    </article>
+    <article class="stat-item stat-highlight">
+      <span class="stat-value" data-stat="descargas_apk">—</span>
+      <span class="stat-label">Descargas del APK</span>
+    </article>
+    <article class="stat-item">
+      <span class="stat-value" data-stat="compartidos">—</span>
+      <span class="stat-label">Veces compartida con otros</span>
+    </article>
+  </div>
+  <p class="stats-foot" id="stats-updated" aria-live="polite"></p>
+</section>
+
+<style>
+  .public-stats {
+    background: linear-gradient(135deg, #fff 0%, #eff6ff 55%, #fff 100%);
+    border: 1px solid rgba(37, 99, 235, 0.2);
+  }
+
+  .stats-lead {
+    margin-bottom: 0;
+  }
+
+  .stats-grid {
+    display: grid;
+    gap: 0.85rem;
+    margin-top: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .stats-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .stat-item {
+    text-align: center;
+    padding: 1rem 0.75rem;
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid var(--color-border);
+  }
+
+  .stat-highlight {
+    border-color: rgba(37, 99, 235, 0.35);
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.12);
+  }
+
+  .stat-value {
+    display: block;
+    font-size: clamp(1.75rem, 6vw, 2.35rem);
+    font-weight: 800;
+    color: var(--color-community);
+    line-height: 1.1;
+  }
+
+  .stat-label {
+    display: block;
+    margin-top: 0.4rem;
+    font-size: 0.88rem;
+    color: var(--color-text-secondary);
+    line-height: 1.35;
+  }
+
+  .stats-foot {
+    margin: 1rem 0 0;
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    text-align: center;
+  }
+</style>

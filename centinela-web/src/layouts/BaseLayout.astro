@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
-import { SITE_NAME, SITE_URL } from '../consts/seo';
+import SiteTracker from '../components/SiteTracker.astro';
+import { SITE_NAME } from '../consts/seo';
 
 interface Props {
   title: string;
@@ -78,5 +79,6 @@ const jsonLdBlocks = jsonLd
   </head>
   <body>
     <slot />
+    <SiteTracker />
   </body>
 </html>

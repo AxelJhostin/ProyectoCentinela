@@ -1,0 +1,77 @@
+---
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from '../consts/supabase';
+---
+
+<script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY }}>
+  const SESSION_VISIT_KEY = 'centinela_sitio_visita';
+  const METRICS_REFRESH_MS = 90_000;
+
+  async function rpc(name, body = {}) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) return null;
+    return res.json();
+  }
+
+  async function trackEvent(tipo) {
+    try {
+      await rpc('registrar_evento_sitio', { p_tipo: tipo });
+      await refreshMetrics();
+    } catch {
+      /* métricas no bloquean la UX */
+    }
+  }
+
+  function formatNumber(n) {
+    return new Intl.NumberFormat('es-EC').format(Number(n) || 0);
+  }
+
+  async function refreshMetrics() {
+    const data = await rpc('obtener_metricas_sitio');
+    if (!data) return;
+
+    document.querySelectorAll('[data-stat]').forEach((el) => {
+      const key = el.getAttribute('data-stat');
+      if (key && data[key] != null) {
+        el.textContent = formatNumber(data[key]);
+      }
+    });
+
+    const foot = document.getElementById('stats-updated');
+    if (foot && data.actualizado_en) {
+      const when = new Date(data.actualizado_en);
+      foot.textContent = `Actualizado ${when.toLocaleString('es-EC', {
+        dateStyle: 'short',
+        timeStyle: 'short',
+      })}`;
+    }
+  }
+
+  function wireTracking() {
+    document.querySelectorAll('[data-track]').forEach((el) => {
+      el.addEventListener('click', () => {
+        const tipo = el.getAttribute('data-track');
+        if (tipo) trackEvent(tipo);
+      });
+    });
+  }
+
+  if (!sessionStorage.getItem(SESSION_VISIT_KEY)) {
+    trackEvent('visita').then(() => {
+      sessionStorage.setItem(SESSION_VISIT_KEY, '1');
+    });
+  }
+
+  wireTracking();
+  refreshMetrics();
+  setInterval(refreshMetrics, METRICS_REFRESH_MS);
+
+  window.centinelaTrack = trackEvent;
+</script>

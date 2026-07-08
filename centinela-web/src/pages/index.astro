@@ -4,6 +4,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import SharePanel from '../components/SharePanel.astro';
 import MobileDownloadBar from '../components/MobileDownloadBar.astro';
+import PublicStats from '../components/PublicStats.astro';
 import {
   DEFAULT_DESCRIPTION,
   DEFAULT_KEYWORDS,
@@ -130,6 +131,12 @@ const jsonLd = [
       </div>
     </section>
 
+    <section class="section">
+      <div class="container">
+        <PublicStats />
+      </div>
+    </section>
+
     <section class="section seo-content">
       <div class="container">
         <h2 class="section-title">Seguridad comunitaria en Ecuador</h2>
@@ -218,7 +225,7 @@ const jsonLd = [
           </ol>
         </div>
         <div class="download-cta">
-          <a class="btn btn-alert btn-full-mobile" href="/centinela.apk" download>
+          <a class="btn btn-alert btn-full-mobile" href="/centinela.apk" download data-track="descarga_apk">
             Descargar centinela.apk
           </a>
           <p class="apk-meta">Versión piloto 0.1.0 · Android 8+</p>

@@ -38,4 +38,10 @@ class AdminService {
       params: {'p_usuario_id': usuarioId, 'p_score': score},
     );
   }
+
+  static Future<Map<String, dynamic>> obtenerMetricasSitio() async {
+    final json = await SupabaseService.client.rpc<dynamic>('obtener_metricas_sitio');
+    if (json == null) return {};
+    return Map<String, dynamic>.from(json as Map);
+  }
 }

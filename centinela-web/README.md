@@ -44,5 +44,6 @@ npx vercel --yes
 ## Notas
 
 - El APK se sirve desde `/centinela.apk` (carpeta `public/`).
+- **Métricas públicas** (visitas, descargas, compartidos) vía Supabase RPC `obtener_metricas_sitio` — visibles en la landing y en el panel admin de la app.
 - Plan gratuito de Vercel: suficiente para piloto y tráfico moderado.
 - Dominio propio: configurar después en Vercel → Domains.

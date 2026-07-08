@@ -40,6 +40,7 @@ const whatsappUrl = `https://wa.me/?text=${shareText}`;
       href={whatsappUrl}
       target="_blank"
       rel="noopener noreferrer"
+      data-track="compartido"
     >
       Compartir por WhatsApp
     </a>
@@ -57,6 +58,13 @@ const whatsappUrl = `https://wa.me/?text=${shareText}`;
     url: window.location.origin + window.location.pathname,
   };
 
+  const trackShare = () => {
+    const w = window;
+    if (typeof w.centinelaTrack === 'function') {
+      w.centinelaTrack('compartido');
+    }
+  };
+
   const feedback = document.getElementById('share-feedback');
   const showFeedback = (msg: string) => {
     if (feedback) feedback.textContent = msg;
@@ -66,9 +74,11 @@ const whatsappUrl = `https://wa.me/?text=${shareText}`;
     try {
       if (navigator.share) {
         await navigator.share(shareData);
+        trackShare();
         showFeedback('¡Gracias por compartir!');
       } else {
         await navigator.clipboard.writeText(shareData.url);
+        trackShare();
         showFeedback('Enlace copiado al portapapeles');
       }
     } catch (err) {
@@ -81,6 +91,7 @@ const whatsappUrl = `https://wa.me/?text=${shareText}`;
   document.getElementById('copy-link-btn')?.addEventListener('click', async () => {
     try {
       await navigator.clipboard.writeText(shareData.url);
+      trackShare();
       showFeedback('Enlace copiado — pégalo en WhatsApp o redes');
     } catch {
       showFeedback('Copia manual: ' + shareData.url);
