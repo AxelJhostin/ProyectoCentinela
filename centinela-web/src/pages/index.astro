@@ -2,13 +2,102 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import {
+  DEFAULT_DESCRIPTION,
+  DEFAULT_KEYWORDS,
+  SITE_NAME,
+  SITE_TAGLINE,
+  SITE_URL,
+} from '../consts/seo';
 
-const title = 'Centinela — Alertas de tu comunidad, cerca de ti';
-const description =
-  'App comunitaria para reportar desapariciones de forma rápida y local. Recibe alertas en tu zona, comparte por WhatsApp y ayuda a encontrar personas.';
+const title = `${SITE_NAME} — ${SITE_TAGLINE}`;
+const description = DEFAULT_DESCRIPTION;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: SITE_NAME,
+    url: SITE_URL,
+    description,
+    inLanguage: 'es-EC',
+    publisher: {
+      '@type': 'Organization',
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: `${SITE_URL}/app_icon.png`,
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: SITE_NAME,
+    applicationCategory: 'SocialNetworkingApplication',
+    operatingSystem: 'Android',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+    },
+    description,
+    downloadUrl: `${SITE_URL}/centinela.apk`,
+    installUrl: `${SITE_URL}/centinela.apk`,
+    url: SITE_URL,
+    image: `${SITE_URL}/app_icon.png`,
+    featureList: [
+      'Alertas push en radio de 10, 30 o 50 km',
+      'Reporte de avistamientos sin exponer teléfono',
+      'Compartir alertas por WhatsApp',
+      'Mapa comunitario de alertas activas',
+    ],
+    areaServed: {
+      '@type': 'City',
+      name: 'Jipijapa',
+      containedInPlace: {
+        '@type': 'AdministrativeArea',
+        name: 'Manabí, Ecuador',
+      },
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: '¿Centinela es gratis?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Sí, durante el piloto la app es gratuita para la comunidad participante.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '¿Centinela reemplaza a la policía?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'No. Es una herramienta comunitaria complementaria. En emergencias reales contacta a las autoridades.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: '¿Cómo descargo Centinela?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Descarga el APK desde proyecto-centinela.vercel.app/centinela.apk e instálalo en Android.',
+        },
+      },
+    ],
+  },
+];
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout
+  title={title}
+  description={description}
+  keywords={DEFAULT_KEYWORDS}
+  jsonLd={jsonLd}
+>
   <Header />
 
   <main>
@@ -40,6 +129,23 @@ const description =
             <li>Sin publicar teléfonos de testigos</li>
           </ul>
         </div>
+      </div>
+    </section>
+
+    <section class="section seo-content">
+      <div class="container">
+        <h2 class="section-title">Seguridad comunitaria en Ecuador</h2>
+        <p class="section-lead">
+          Centinela ayuda a vecinos de Jipijapa, Manabí y zonas cercanas a coordinarse
+          cuando una persona desaparece. Es una app de alertas hiperlocales: notificaciones
+          push por proximidad, mapa de alertas activas y botón «Lo vi» para reportar
+          avistamientos de forma responsable.
+        </p>
+        <p class="seo-text">
+          Si buscas una aplicación para personas desaparecidas en Ecuador, seguridad
+          vecinal o alertas comunitarias con difusión por WhatsApp, puedes descargar el
+          APK de Centinela gratis mientras avanzamos hacia Play Store.
+        </p>
       </div>
     </section>
 
@@ -292,6 +398,12 @@ const description =
   .faq-list {
     display: grid;
     gap: 0.75rem;
+  }
+
+  .seo-text {
+    color: var(--color-text-secondary);
+    max-width: 70ch;
+    margin: 0;
   }
 
   details summary {

@@ -2,14 +2,44 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import { SITE_NAME, SITE_URL } from '../consts/seo';
 
-const title = 'Política de privacidad — Centinela';
+const title = `Política de privacidad y términos — ${SITE_NAME}`;
 const description =
-  'Política de privacidad y tratamiento de datos personales de Centinela conforme a la LOPDP de Ecuador.';
+  'Política de privacidad, tratamiento de datos personales y términos de uso de Centinela conforme a la LOPDP de Ecuador. Ubicación, notificaciones push, imágenes y derechos ARCO.';
+const keywords = [
+  'política de privacidad Centinela',
+  'LOPDP Ecuador',
+  'tratamiento de datos personales',
+  'app alertas comunitarias privacidad',
+  'derechos ARCO',
+  'términos de uso Centinela',
+];
 const updated = '8 de julio de 2026';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: title,
+  description,
+  url: `${SITE_URL}/privacidad`,
+  inLanguage: 'es-EC',
+  dateModified: '2026-07-08',
+  isPartOf: {
+    '@type': 'WebSite',
+    name: SITE_NAME,
+    url: SITE_URL,
+  },
+};
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout
+  title={title}
+  description={description}
+  keywords={keywords}
+  ogType="article"
+  jsonLd={jsonLd}
+>
   <Header />
 
   <main class="section">

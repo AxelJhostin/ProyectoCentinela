@@ -1,8 +1,13 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 
-// Actualizar `site` cuando Vercel asigne la URL definitiva (*.vercel.app).
 export default defineConfig({
   site: 'https://proyecto-centinela.vercel.app',
   compressHTML: true,
+  integrations: [
+    sitemap({
+      filter: (page) => !page.includes('/404'),
+    }),
+  ],
 });

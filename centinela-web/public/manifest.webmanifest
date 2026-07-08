@@ -1,0 +1,18 @@
+{
+  "name": "Centinela",
+  "short_name": "Centinela",
+  "description": "Alertas comunitarias hiperlocales para personas desaparecidas en Ecuador.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F9FAFB",
+  "theme_color": "#2563EB",
+  "lang": "es-EC",
+  "icons": [
+    {
+      "src": "/app_icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

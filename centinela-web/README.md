@@ -31,8 +31,8 @@ Abre http://localhost:4321
 1. Crea cuenta en [vercel.com](https://vercel.com) e importa el repo `ProyectoCentinela`.
 2. En **Project Settings → General → Root Directory**, pon: `centinela-web`
 3. Framework Preset: **Astro** (detecta build automáticamente).
-4. Deploy. Obtendrás una URL tipo `https://proyecto-centinela-xxx.vercel.app`
-5. Actualiza `site` en `astro.config.mjs` con esa URL para SEO/OG.
+4. Deploy. URL en producción: **https://proyecto-centinela.vercel.app**
+5. El sitemap se genera en build: `/sitemap-index.xml` (referenciado en `robots.txt`).
 
 ### CLI (opcional)
 
