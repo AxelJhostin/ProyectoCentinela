@@ -10,17 +10,21 @@ Plataforma móvil de **alertas comunitarias hiperlocales** para reportes de pers
 
 MVP **funcional** en piloto Jipijapa (Android): emitir alerta, push en radio, Lo vi, WhatsApp, resolver caso.
 
-**Siguiente:** Sprint 7 — identidad visual (logo, icono, splash).
+**Sitio web:** landing + privacidad en [`centinela-web/`](centinela-web/README.md) (Astro → Vercel gratis).
 
-Detalle por sprint: [sprints/](sprints/).
+Detalle: [Documentos/Estado-Proyecto.md](Documentos/Estado-Proyecto.md)
 
 ---
 
-## Sprint 7 — identidad visual
+## Sitio web (descarga APK)
 
-- Tagline: *Alertas de tu comunidad, cerca de ti.*
-- Icono adaptive Android + splash + onboarding con logo
-- Guía: [Documentos/guias/Guia-Marca-Centinela.md](Documentos/guias/Guia-Marca-Centinela.md)
+```bash
+./scripts/build_apk.sh
+./scripts/prepare_web_apk.sh
+cd centinela-web && npm run dev
+```
+
+Deploy gratuito: importar repo en [Vercel](https://vercel.com) con **Root Directory** = `centinela-web`. Ver [centinela-web/README.md](centinela-web/README.md).
 
 ---
 

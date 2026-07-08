@@ -1,0 +1,173 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const title = 'Política de privacidad — Centinela';
+const description =
+  'Política de privacidad y tratamiento de datos personales de Centinela conforme a la LOPDP de Ecuador.';
+const updated = '8 de julio de 2026';
+---
+
+<BaseLayout title={title} description={description}>
+  <Header />
+
+  <main class="section">
+    <div class="container legal">
+      <span class="badge">LOPDP · Ecuador</span>
+      <h1>Política de privacidad y términos de uso</h1>
+      <p class="updated">Última actualización: {updated}</p>
+
+      <p>
+        Centinela («la App») es una herramienta comunitaria en fase piloto para reportar
+        desapariciones de forma rápida y local. Esta política describe qué datos
+        recopilamos, para qué los usamos y cuáles son tus derechos.
+      </p>
+
+      <h2>1. Responsable del tratamiento</h2>
+      <p>
+        Responsable del piloto Centinela (proyecto comunitario en Ecuador). Para
+        ejercer tus derechos o solicitar eliminación de datos, escribe a
+        <a href="mailto:axelhernan69@gmail.com">axelhernan69@gmail.com</a>.
+      </p>
+
+      <h2>2. Propósito del servicio</h2>
+      <p>
+        La App permite emitir alertas de desaparición, notificar a usuarios cercanos,
+        registrar avistamientos y compartir información por WhatsApp. <strong>No
+        reemplaza</strong> a la Policía Nacional ni a autoridades competentes.
+      </p>
+
+      <h2>3. Datos que recopilamos</h2>
+      <ul>
+        <li><strong>Identificador anónimo</strong> de sesión (autenticación anónima de Supabase).</li>
+        <li><strong>Ubicación aproximada</strong> (GPS) para calcular distancias, avistamientos y notificaciones en radio.</li>
+        <li><strong>Token de notificaciones push</strong> (FCM) para enviarte alertas relevantes.</li>
+        <li><strong>Fotografías</strong> que tú subes al crear una alerta (comprimidas antes de enviarse).</li>
+        <li><strong>Contenido de alertas y avistamientos</strong> (nombre reportado, edad aproximada, vestimenta, notas).</li>
+        <li><strong>Metadatos técnicos</strong> mínimos (logs de operación, eventos de compartido) para seguridad y mejora del servicio.</li>
+      </ul>
+      <p>
+        <strong>No publicamos</strong> tu número de teléfono ni datos de contacto directo
+        a otros usuarios en la App.
+      </p>
+
+      <h2>4. Base legal y finalidad (LOPDP)</h2>
+      <p>Tratamos tus datos para:</p>
+      <ul>
+        <li>Prestar el servicio de alertas comunitarias hiperlocales.</li>
+        <li>Enviar notificaciones push cuando hay alertas o avistamientos relevantes.</li>
+        <li>Prevenir abuso (alertas falsas, rate limits, moderación comunitaria).</li>
+        <li>Cumplir obligaciones legales y responder solicitudes de autoridades cuando aplique.</li>
+      </ul>
+
+      <h2>5. Ubicación</h2>
+      <p>
+        La ubicación es necesaria para el funcionamiento principal. Si deniegas el
+        permiso, algunas funciones (alertas en radio, avistamientos con distancia) no
+        estarán disponibles.
+      </p>
+
+      <h2>6. Imágenes</h2>
+      <p>
+        Al subir una fotografía declaras que tienes derecho a usarla y que corresponde a
+        la situación reportada. Las imágenes se almacenan en infraestructura cloud
+        (Supabase Storage) asociada al proyecto Centinela.
+      </p>
+
+      <h2>7. Compartir datos</h2>
+      <p>Podemos compartir datos con:</p>
+      <ul>
+        <li><strong>Proveedores técnicos</strong>: Supabase (base de datos, auth, storage), Firebase (notificaciones push), Vercel (sitio web de descarga).</li>
+        <li><strong>Usuarios de la comunidad</strong>: información de alertas activas dentro del radio configurado (sin datos de contacto de testigos).</li>
+      </ul>
+      <p>No vendemos tus datos personales.</p>
+
+      <h2>8. Conservación</h2>
+      <p>
+        Las alertas resueltas o cerradas pueden archivarse automáticamente después de
+        aproximadamente 90 días. Los logs técnicos se conservan el tiempo necesario
+        para operación y seguridad.
+      </p>
+
+      <h2>9. Tus derechos</h2>
+      <p>Conforme a la LOPDP puedes solicitar:</p>
+      <ul>
+        <li>Acceso, rectificación o eliminación de tus datos.</li>
+        <li>Información sobre el tratamiento y revocación del consentimiento cuando corresponda.</li>
+      </ul>
+      <p>
+        Escríbenos a <a href="mailto:axelhernan69@gmail.com">axelhernan69@gmail.com</a>.
+      </p>
+
+      <h2>10. Uso responsable</h2>
+      <p>
+        Solo debes emitir alertas ante situaciones reales. Las alertas falsas pueden ser
+        reportadas por la comunidad y restringir tu cuenta. El uso indebido puede tener
+        consecuencias legales según la normativa ecuatoriana.
+      </p>
+
+      <h2>11. Menores de edad</h2>
+      <p>
+        El servicio está dirigido a mayores de edad o uso supervisado por un
+        responsable legal. No recopilamos intencionalmente datos de menores sin
+        consentimiento parental.
+      </p>
+
+      <h2>12. Seguridad</h2>
+      <p>
+        Aplicamos medidas técnicas razonables (autenticación, reglas de acceso en base
+        de datos, HTTPS). Ningún sistema es 100 % infalible; el piloto se ofrece con las
+        limitaciones propias de un MVP.
+      </p>
+
+      <h2>13. Limitación de responsabilidad</h2>
+      <p>
+        Centinela es un MVP en fase piloto. No garantizamos la exactitud de los reportes
+        de terceros ni la disponibilidad continua del servicio. Los usuarios participan
+        de forma voluntaria y solidaria.
+      </p>
+
+      <h2>14. Cambios a esta política</h2>
+      <p>
+        Podemos actualizar este documento. La fecha de «Última actualización» indicará la
+        versión vigente. El uso continuado de la App implica aceptación de los cambios
+        sustanciales comunicados.
+      </p>
+
+      <div class="card notice">
+        <p>
+          <strong>Nota del piloto:</strong> Este texto será revisado por asesoría legal
+          antes del despliegue público amplio. Versión piloto · Jipijapa 2026.
+        </p>
+      </div>
+
+      <p><a href="/">← Volver al inicio</a></p>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .legal h1 {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    margin: 0.75rem 0;
+    font-weight: 800;
+  }
+
+  .updated {
+    color: var(--color-text-secondary);
+    margin-bottom: 1.5rem;
+  }
+
+  .notice {
+    margin-top: 2rem;
+    background: rgba(37, 99, 235, 0.08);
+  }
+
+  .notice p {
+    margin: 0;
+    color: var(--color-text-secondary);
+  }
+</style>

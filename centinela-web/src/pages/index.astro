@@ -1,0 +1,306 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const title = 'Centinela — Alertas de tu comunidad, cerca de ti';
+const description =
+  'App comunitaria para reportar desapariciones de forma rápida y local. Recibe alertas en tu zona, comparte por WhatsApp y ayuda a encontrar personas.';
+---
+
+<BaseLayout title={title} description={description}>
+  <Header />
+
+  <main>
+    <section class="hero section">
+      <div class="container hero-grid">
+        <div>
+          <span class="badge">Piloto · Jipijapa y alrededores</span>
+          <h1>Alertas de tu comunidad, cerca de ti.</h1>
+          <p class="hero-lead">
+            Centinela conecta a vecinos cuando alguien desaparece. Emite una alerta en
+            segundos, la comunidad cercana recibe notificación push y puede reportar
+            avistamientos sin exponer datos sensibles.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#descargar">Descargar APK gratis</a>
+            <a class="btn btn-outline" href="#como-funciona">Ver cómo funciona</a>
+          </div>
+          <p class="hero-note">
+            Versión piloto para Android. Play Store próximamente.
+          </p>
+        </div>
+        <div class="hero-card card">
+          <img src="/app_icon.png" alt="Logo Centinela" width="96" height="96" />
+          <h2>Tu red de apoyo hiperlocal</h2>
+          <ul>
+            <li>Push en radio de 10, 30 o 50 km</li>
+            <li>Botón «Lo vi» con ubicación aproximada</li>
+            <li>Compartir alerta por WhatsApp con vista previa</li>
+            <li>Sin publicar teléfonos de testigos</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="como-funciona" class="section">
+      <div class="container">
+        <h2 class="section-title">Cómo funciona</h2>
+        <p class="section-lead">
+          Tres pasos simples. Diseñado para situaciones reales, con tono serio y
+          responsable — no reemplaza a la Policía Nacional.
+        </p>
+        <div class="grid-3">
+          <article class="card step">
+            <span class="step-num">1</span>
+            <h3>Emite la alerta</h3>
+            <p>
+              Foto, último lugar visto y radio de búsqueda. La alerta llega a usuarios
+              cercanos en menos de un minuto.
+            </p>
+          </article>
+          <article class="card step">
+            <span class="step-num">2</span>
+            <h3>La comunidad reacciona</h3>
+            <p>
+              Vecinos reciben push, ven el mapa y pueden marcar «Lo vi» con una nota y
+              ubicación aproximada.
+            </p>
+          </article>
+          <article class="card step">
+            <span class="step-num">3</span>
+            <h3>Se difunde y se cierra</h3>
+            <p>
+              Comparte por WhatsApp para ampliar la búsqueda. Cuando la persona aparece,
+              el emisor marca el caso como resuelto.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section trust">
+      <div class="container trust-grid">
+        <div class="card">
+          <h3>Hecho para la confianza</h3>
+          <p>
+            Consentimiento LOPDP, moderación comunitaria, límites contra alertas falsas y
+            datos mínimos necesarios para operar en tu zona.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Empezamos local</h3>
+          <p>
+            Piloto en Jipijapa. Si estás en otra ciudad, descarga la app y déjanos saber
+            tu interés — estamos preparando expansión gradual.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="descargar" class="section download">
+      <div class="container download-box card">
+        <div>
+          <h2 class="section-title">Descarga Centinela (Android)</h2>
+          <p class="section-lead">
+            Instalación directa del APK. Al ser una app fuera de Play Store, Android puede
+            pedirte permitir «orígenes desconocidos» o confirmar con Play Protect.
+          </p>
+          <ol class="install-steps">
+            <li>Descarga el archivo APK con el botón de abajo.</li>
+            <li>Abre el archivo y toca <strong>Instalar</strong>.</li>
+            <li>Si Play Protect avisa, elige <strong>Instalar de todas formas</strong> (app de confianza del piloto).</li>
+            <li>Concede permisos de ubicación y notificaciones para recibir alertas.</li>
+          </ol>
+        </div>
+        <div class="download-cta">
+          <a class="btn btn-alert" href="/centinela.apk" download>
+            Descargar centinela.apk
+          </a>
+          <p class="apk-meta">Versión piloto 0.1.0 · Android 8+</p>
+          <a class="privacy-link" href="/privacidad">Leer política de privacidad</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section faq">
+      <div class="container">
+        <h2 class="section-title">Preguntas frecuentes</h2>
+        <div class="faq-list">
+          <details class="card">
+            <summary>¿Es gratis?</summary>
+            <p>Sí, durante el piloto la app es gratuita para la comunidad participante.</p>
+          </details>
+          <details class="card">
+            <summary>¿Reemplaza a la policía?</summary>
+            <p>
+              No. Centinela es una herramienta comunitaria complementaria. En una
+              emergencia real, contacta siempre a las autoridades competentes.
+            </p>
+          </details>
+          <details class="card">
+            <summary>¿Por qué no está en Play Store aún?</summary>
+            <p>
+              Estamos en fase piloto. Publicaremos en Play Store cuando cerremos pruebas
+              de campo y requisitos legales. Mientras tanto, ofrecemos el APK aquí.
+            </p>
+          </details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .hero {
+    padding-top: 3rem;
+  }
+
+  .hero-grid {
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  @media (min-width: 900px) {
+    .hero-grid {
+      grid-template-columns: 1.2fr 0.8fr;
+    }
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    line-height: 1.1;
+    margin: 1rem 0;
+    font-weight: 800;
+  }
+
+  .hero-lead {
+    font-size: 1.1rem;
+    color: var(--color-text-secondary);
+    max-width: 52ch;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 1.5rem 0 1rem;
+  }
+
+  .hero-note {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+  }
+
+  .hero-card h2 {
+    margin: 1rem 0 0.75rem;
+    font-size: 1.25rem;
+  }
+
+  .hero-card ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    color: var(--color-text-secondary);
+  }
+
+  .hero-card li + li {
+    margin-top: 0.5rem;
+  }
+
+  .step-num {
+    display: inline-flex;
+    width: 2rem;
+    height: 2rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--color-community);
+    color: #fff;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+  }
+
+  .step h3 {
+    margin: 0 0 0.5rem;
+  }
+
+  .step p {
+    margin: 0;
+    color: var(--color-text-secondary);
+  }
+
+  .trust-grid {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .trust-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .trust-grid h3 {
+    margin-top: 0;
+  }
+
+  .trust-grid p {
+    margin-bottom: 0;
+    color: var(--color-text-secondary);
+  }
+
+  .download-box {
+    display: grid;
+    gap: 2rem;
+    align-items: start;
+    background: linear-gradient(135deg, #fff 0%, #eff6ff 100%);
+  }
+
+  @media (min-width: 900px) {
+    .download-box {
+      grid-template-columns: 1.4fr 0.6fr;
+    }
+  }
+
+  .install-steps {
+    margin: 0;
+    padding-left: 1.25rem;
+    color: var(--color-text-secondary);
+  }
+
+  .install-steps li + li {
+    margin-top: 0.5rem;
+  }
+
+  .download-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .apk-meta,
+  .privacy-link {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+
+  .faq-list {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  details summary {
+    cursor: pointer;
+    font-weight: 700;
+  }
+
+  details p {
+    margin: 0.75rem 0 0;
+    color: var(--color-text-secondary);
+  }
+</style>

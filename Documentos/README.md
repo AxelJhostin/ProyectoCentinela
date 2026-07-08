@@ -40,6 +40,7 @@ python3 scripts/actualizar_documentos.py
 | [Firebase FCM](guias/Firebase-Setup.md) | Push notifications, secrets, deploy functions |
 | [Supabase Staging](guias/Supabase-Staging.md) | Entorno de pruebas separado |
 | [Backup y retención](guias/Backup-Retencion.md) | Política de datos y backups |
+| [Sitio web (Astro)](../../centinela-web/README.md) | Landing, APK y privacidad en Vercel |
 | [Guía de marca](guias/Guia-Marca-Centinela.md) | Logo, colores, tagline, assets |
 
 ---

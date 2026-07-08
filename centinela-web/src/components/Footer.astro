@@ -1,0 +1,40 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <p>© {year} Centinela · Piloto comunitario · Ecuador</p>
+    <div class="footer-links">
+      <a href="/privacidad">Política de privacidad</a>
+      <a href="/#descargar">Descargar APK</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--color-border);
+    padding: 2rem 0;
+    margin-top: 2rem;
+  }
+
+  .footer-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 1.25rem;
+  }
+
+  .footer-links a {
+    font-weight: 600;
+  }
+</style>

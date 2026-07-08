@@ -1,0 +1,147 @@
+:root {
+  --color-community: #2563eb;
+  --color-alert: #dc2626;
+  --color-whatsapp: #25d366;
+  --color-bg: #f9fafb;
+  --color-surface: #ffffff;
+  --color-text: #111827;
+  --color-text-secondary: #6b7280;
+  --color-border: #e5e7eb;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --shadow: 0 12px 40px rgba(37, 99, 235, 0.12);
+  --max-width: 1100px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: var(--color-community);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+.container {
+  width: min(100% - 2rem, var(--max-width));
+  margin-inline: auto;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1.4rem;
+  border-radius: 999px;
+  font-weight: 700;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn-primary {
+  background: var(--color-community);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+}
+
+.btn-alert {
+  background: var(--color-alert);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(220, 38, 38, 0.25);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--color-community);
+  border: 2px solid var(--color-community);
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--color-community);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.section {
+  padding: 4rem 0;
+}
+
+.section-title {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+}
+
+.section-lead {
+  color: var(--color-text-secondary);
+  margin: 0 0 2rem;
+  max-width: 60ch;
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.grid-3 {
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.legal h2 {
+  font-size: 1.15rem;
+  margin-top: 2rem;
+}
+
+.legal p,
+.legal li {
+  color: var(--color-text-secondary);
+}
+
+.legal ul {
+  padding-left: 1.25rem;
+}

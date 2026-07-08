@@ -39,3 +39,8 @@ env/app.env
 
 # Logs
 *.log
+
+# Astro web (centinela-web)
+centinela-web/node_modules/
+centinela-web/dist/
+centinela-web/.vercel/

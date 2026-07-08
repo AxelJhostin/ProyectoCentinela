@@ -12,7 +12,8 @@
 | Supabase + PostGIS + FCM | ✅ Producción piloto |
 | Piloto Alfa/Beta | ✅ Push, Lo vi, WhatsApp, mapa |
 | Identidad visual (logo, icono, splash) | ✅ Sprint 7 |
-| Sprints 8–10 (UX, backend, admin) | ✅ Código listo — aplicar migraciones en Supabase |
+| Sprints 8–10 (UX, backend, admin) | ✅ Código + Supabase desplegado |
+| Sitio web (landing + privacidad) | ✅ Astro en `centinela-web/` → Vercel |
 | Play Store | ⬜ Siguiente |
 
 ---
@@ -60,7 +61,7 @@ Instalar en Android: copiar el APK o `adb install -r build/app/outputs/flutter-a
 
 ## Siguiente fase
 
-1. Página web + política de privacidad URL  
+1. Deploy sitio en Vercel (gratis) y compartir URL de descarga  
 2. Play Store (testing cerrado Jipijapa)  
 3. Difusión comunitaria  
 
