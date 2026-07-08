@@ -11,6 +11,7 @@ import '../../services/geocoding_service.dart';
 import '../../services/moderacion_service.dart';
 import '../../services/push_service.dart';
 import '../../services/share_service.dart';
+import '../../utils/user_facing_error.dart';
 import '../theme/centinela_spacing.dart';
 import '../theme/centinela_theme.dart';
 import '../widgets/avistamiento_mapa_dialog.dart';
@@ -77,7 +78,9 @@ class _DetalleAlertaScreenState extends State<DetalleAlertaScreen> {
       Navigator.of(context).pop();
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(userFacingError(e))),
+      );
     } finally {
       if (mounted) setState(() => _resolviendo = false);
     }
@@ -149,7 +152,9 @@ class _DetalleAlertaScreenState extends State<DetalleAlertaScreen> {
       Navigator.of(context).pop();
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(userFacingError(e))),
+      );
     } finally {
       if (mounted) setState(() => _reportandoFalsa = false);
     }

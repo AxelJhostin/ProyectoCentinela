@@ -11,12 +11,16 @@ class CentinelaEmptyState extends StatelessWidget {
     this.subtitle,
     this.icon = Icons.check_circle_outline,
     this.iconColor = CentinelaColors.community,
+    this.actionLabel,
+    this.onAction,
   });
 
   final String title;
   final String? subtitle;
   final IconData icon;
   final Color iconColor;
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +54,13 @@ class CentinelaEmptyState extends StatelessWidget {
                 color: CentinelaColors.textSecondary,
               ),
               textAlign: TextAlign.center,
+            ),
+          ],
+          if (actionLabel != null && onAction != null) ...[
+            const SizedBox(height: CentinelaSpacing.md),
+            FilledButton.tonal(
+              onPressed: onAction,
+              child: Text(actionLabel!),
             ),
           ],
         ],

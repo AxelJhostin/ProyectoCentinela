@@ -1,6 +1,6 @@
 # Estado del proyecto — Centinela
 
-Última actualización: junio 2026 · MVP funcional en piloto Manabí.
+Última actualización: julio 2026 · MVP funcional en piloto Manabí.
 
 ---
 
@@ -13,8 +13,9 @@
 | Piloto Alfa/Beta | ✅ Push, Lo vi, WhatsApp, mapa |
 | Identidad visual (logo, icono, splash) | ✅ Sprint 7 |
 | Sprints 8–10 (UX, backend, admin) | ✅ Código + Supabase desplegado |
+| Sprint 12 (UX app, APK web) | ✅ v0.1.1 — modo testigo/emisor, Acerca, pull-to-refresh |
 | Sitio web (landing + privacidad) | ✅ https://proyecto-centinela.vercel.app |
-| Play Store | ⬜ Siguiente |
+| Play Store | ⬜ Pospuesto — pruebas vía APK en sitio |
 
 ---
 
@@ -31,6 +32,7 @@
 | 8 | Mi alerta activa, filtros, validación foto, onboarding contextual |
 | 9 | Logs, rate limits, historial, offline, staging |
 | 10 | Compartidos + push, panel admin, retención 90 días |
+| 12 | Modo testigo/emisor, pantalla Acerca, tips contextuales, errores amigables, APK 0.1.1 en web |
 
 Detalle: [sprints/](sprints/) · Marca: [Guia-Marca-Centinela.md](guias/Guia-Marca-Centinela.md)
 
@@ -51,9 +53,10 @@ Detalle: [sprints/](sprints/) · Marca: [Guia-Marca-Centinela.md](guias/Guia-Mar
 
 ```bash
 ./scripts/build_apk.sh
+./scripts/prepare_web_apk.sh   # copia APK a centinela-web/public/
 ```
 
-APK: `build/app/outputs/flutter-apk/app-release.apk`
+APK: `build/app/outputs/flutter-apk/app-release.apk` · Web: `/centinela.apk` (v0.1.1)
 
 Instalar en Android: copiar el APK o `adb install -r build/app/outputs/flutter-apk/app-release.apk`. Si Play Protect avisa, es normal fuera de Play Store → **Instalar de todas formas**.
 
@@ -61,9 +64,10 @@ Instalar en Android: copiar el APK o `adb install -r build/app/outputs/flutter-a
 
 ## Siguiente fase
 
-1. Difusión comunitaria con URL pública del sitio  
-2. Play Store (testing cerrado Manabí)  
-3. Registrar sitio en Google Search Console  
+1. Probar v0.1.1 en campo (descargar APK desde el sitio)
+2. Difusión comunitaria con URL pública del sitio  
+3. Play Store (cuando el piloto lo requiera)  
+4. Registrar sitio en Google Search Console  
 
 ---
 

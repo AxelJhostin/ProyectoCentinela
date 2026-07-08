@@ -4,6 +4,7 @@ import 'package:latlong2/latlong.dart';
 import '../../services/avistamiento_service.dart';
 import '../../services/push_service.dart';
 import '../../services/location_service.dart';
+import '../../utils/user_facing_error.dart';
 import '../theme/centinela_spacing.dart';
 import '../theme/centinela_theme.dart';
 import '../widgets/ubicacion_pin_picker.dart';
@@ -75,7 +76,9 @@ class _ConfirmarAvistamientoScreenState extends State<ConfirmarAvistamientoScree
       Navigator.of(context).pop(true);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(userFacingError(e))),
+      );
     } finally {
       if (mounted) setState(() => _enviando = false);
     }

@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/alerta_desaparecido.dart';
+import '../../config/app_env.dart';
 import '../../services/admin_service.dart';
 import '../../services/alerta_filtros_service.dart';
 import '../../services/alerta_service.dart';
@@ -12,8 +14,10 @@ import '../../services/avistamiento_service.dart';
 import '../../services/home_tips_service.dart';
 import '../../services/location_service.dart';
 import '../../services/share_service.dart';
+import '../../services/user_role_service.dart';
 import '../../services/witness_guide_service.dart';
 import '../../utils/alerta_filtros.dart';
+import '../../utils/user_facing_error.dart';
 import '../theme/centinela_spacing.dart';
 import '../theme/centinela_theme.dart';
 import '../widgets/alerta_card.dart';
@@ -22,6 +26,7 @@ import '../widgets/centinela_empty_state.dart';
 import '../widgets/centinela_logo.dart';
 import '../widgets/centinela_map_marker.dart';
 import '../widgets/emitir_alerta_fab.dart';
+import 'acerca_screen.dart';
 import 'admin_screen.dart';
 import 'detalle_alerta_screen.dart';
 import 'emision_screen.dart';
@@ -45,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   String? _error;
   bool _loading = true;
   bool _tieneAlertaActiva = false;
+  ModoUsuario _modo = ModoUsuario.emisor;
   FiltroDistanciaKm _filtroDistancia = FiltroDistanciaKm.sinLimite;
   FiltroAntiguedad _filtroAntiguedad = FiltroAntiguedad.todas;
   StreamSubscription<List<AlertaDesaparecido>>? _alertasSub;
@@ -58,6 +64,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _cargarFiltros();
+    _cargarModo();
     _initLocation();
     _ubicacionTimer = Timer.periodic(
       const Duration(minutes: 3),
@@ -79,6 +86,31 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     _avistamientosSub?.cancel();
     _ubicacionTimer?.cancel();
     super.dispose();
+  }
+
+  Future<void> _cargarModo() async {
+    final modo = await UserRoleService.getModo();
+    if (mounted) setState(() => _modo = modo);
+  }
+
+  Future<void> _abrirAcerca() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const AcercaScreen()),
+    );
+    await _cargarModo();
+  }
+
+  Future<void> _compartirSitio() async {
+    final ok = await launchUrl(
+      Uri.parse(AppEnv.webUrl),
+      mode: LaunchMode.externalApplication,
+    );
+    if (!mounted) return;
+    if (!ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No se pudo abrir el sitio web')),
+      );
+    }
   }
 
   Future<void> _cargarFiltros() async {
@@ -310,6 +342,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         surfaceTintColor: Colors.transparent,
                         actions: [
                           IconButton(
+                            icon: const Icon(Icons.info_outline),
+                            tooltip: 'Acerca y actualizaciones',
+                            onPressed: _abrirAcerca,
+                          ),
+                          IconButton(
                             icon: const Icon(Icons.history),
                             tooltip: 'Historial',
                             onPressed: _abrirHistorial,
@@ -393,7 +430,42 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           child: const Icon(Icons.my_location),
                         ),
                       const SizedBox(height: 12),
-                      EmitirAlertaFab(onPressed: _abrirEmision),
+                      if (_modo == ModoUsuario.emisor)
+                        EmitirAlertaFab(onPressed: _abrirEmision)
+                      else
+                        Material(
+                          color: CentinelaColors.surface,
+                          borderRadius: BorderRadius.circular(CentinelaSpacing.radiusMd),
+                          elevation: 2,
+                          child: InkWell(
+                            onTap: _abrirAcerca,
+                            borderRadius: BorderRadius.circular(CentinelaSpacing.radiusMd),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 10,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.visibility_outlined,
+                                    color: CentinelaColors.community,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Modo testigo',
+                                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                      color: CentinelaColors.community,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -442,7 +514,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         icon: Icons.error_outline,
         iconColor: CentinelaColors.alertCritical,
         title: 'No pudimos cargar las alertas',
-        subtitle: 'Toca actualizar arriba para reintentar.',
+        subtitle: userFacingError(_error!),
+        actionLabel: 'Reintentar',
+        onAction: _initLocation,
       );
     }
 
@@ -530,30 +604,48 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           ),
         ),
         Expanded(
-          child: _alertasFiltradas.isEmpty
-              ? CentinelaEmptyState(
-                  title: _alertas.isEmpty
-                      ? 'Tu zona está tranquila por ahora'
-                      : 'Ninguna alerta con estos filtros',
-                  subtitle: _alertas.isEmpty
-                      ? 'No hay alertas activas cerca de ti. '
-                          'Si necesitas ayuda, usa el botón rojo del mapa.'
-                      : 'Prueba ampliar distancia o antigüedad.',
-                  icon: Icons.shield_outlined,
-                )
-              : ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                  itemCount: _alertasFiltradas.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    final alerta = _alertasFiltradas[index];
-                    return AlertaCard(
-                      alerta: alerta,
-                      onTap: () => _openDetalle(alerta),
-                      onShare: () => _compartirWhatsApp(alerta),
-                    );
-                  },
-                ),
+          child: RefreshIndicator(
+            color: CentinelaColors.community,
+            onRefresh: _initLocation,
+            child: _alertasFiltradas.isEmpty
+                ? ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(
+                        height: 120,
+                        child: CentinelaEmptyState(
+                          title: _alertas.isEmpty
+                              ? 'Tu zona está tranquila por ahora'
+                              : 'Ninguna alerta con estos filtros',
+                          subtitle: _alertas.isEmpty
+                              ? (_modo == ModoUsuario.testigo
+                                  ? 'Mantente atento a las notificaciones. '
+                                      'Invita vecinos a instalar Centinela.'
+                                  : 'No hay alertas activas cerca de ti. '
+                                      'Si necesitas ayuda, usa el botón rojo del mapa.')
+                              : 'Prueba ampliar distancia o antigüedad.',
+                          icon: Icons.shield_outlined,
+                          actionLabel: _alertas.isEmpty ? 'Invitar vecinos' : null,
+                          onAction: _alertas.isEmpty ? _compartirSitio : null,
+                        ),
+                      ),
+                    ],
+                  )
+                : ListView.separated(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                    itemCount: _alertasFiltradas.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: 12),
+                    itemBuilder: (context, index) {
+                      final alerta = _alertasFiltradas[index];
+                      return AlertaCard(
+                        alerta: alerta,
+                        onTap: () => _openDetalle(alerta),
+                        onShare: () => _compartirWhatsApp(alerta),
+                      );
+                    },
+                  ),
+          ),
         ),
       ],
     );

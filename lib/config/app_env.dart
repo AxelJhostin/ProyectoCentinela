@@ -39,4 +39,10 @@ class AppEnv {
   static String get privacyPolicyUrl =>
       dotenv.env['CENTINELA_PRIVACY_URL'] ??
       'https://proyecto-centinela.vercel.app/privacidad';
+
+  /// Sitio público (landing, QR, métricas).
+  static String get webUrl =>
+      dotenv.env['CENTINELA_WEB_URL'] ?? 'https://proyecto-centinela.vercel.app';
+
+  static String get apkDownloadUrl => '$webUrl/centinela.apk';
 }

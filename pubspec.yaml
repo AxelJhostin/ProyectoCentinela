@@ -1,7 +1,7 @@
 name: centinela
 description: Proyecto Centinela — alertas comunitarias hiperlocales (MVP).
 publish_to: 'none'
-version: 0.1.0+1
+version: 0.1.1+2
 
 environment:
   sdk: ^3.12.2
@@ -23,6 +23,7 @@ dependencies:
   path: ^1.9.1
   path_provider: ^2.1.5
   url_launcher: ^6.3.1
+  package_info_plus: ^8.3.0
   app_links: ^6.4.0
   http: ^1.4.0
   firebase_core: ^3.15.2

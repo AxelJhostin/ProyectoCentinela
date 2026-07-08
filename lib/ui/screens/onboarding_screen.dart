@@ -4,6 +4,7 @@ import '../../main.dart';
 import '../../services/legal_service.dart';
 import '../../services/location_service.dart';
 import '../../services/onboarding_service.dart';
+import '../../services/user_role_service.dart';
 import '../theme/centinela_spacing.dart';
 import '../theme/centinela_theme.dart';
 import '../widgets/centinela_logo.dart';
@@ -25,6 +26,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   bool _notificationGranted = false;
   bool _legalAccepted = false;
   bool _finishing = false;
+  ModoUsuario _modo = ModoUsuario.emisor;
 
   static const _tips = [
     (
@@ -70,6 +72,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     setState(() => _finishing = true);
     try {
+      await UserRoleService.setModo(_modo);
       await LegalService.acceptTerms();
       await OnboardingService.markCompleted();
       if (!mounted) return;
@@ -122,6 +125,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
             Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  _tips.length + 1,
+                  (i) => Container(
+                    width: i == _page ? 20 : 8,
+                    height: 8,
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(4),
+                      color: i == _page
+                          ? CentinelaColors.community
+                          : CentinelaColors.border,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Padding(
               padding: const EdgeInsets.all(CentinelaSpacing.lg),
               child: _page < _tips.length
                   ? FilledButton(
@@ -149,6 +172,31 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           const Spacer(),
           const CentinelaLogo(),
+          const SizedBox(height: CentinelaSpacing.lg),
+          Text(
+            '¿Cómo usarás Centinela?',
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: CentinelaSpacing.sm),
+          SegmentedButton<ModoUsuario>(
+            segments: const [
+              ButtonSegment(
+                value: ModoUsuario.testigo,
+                label: Text('Solo alertas'),
+                icon: Icon(Icons.notifications_outlined),
+              ),
+              ButtonSegment(
+                value: ModoUsuario.emisor,
+                label: Text('Emitir también'),
+                icon: Icon(Icons.campaign_outlined),
+              ),
+            ],
+            selected: {_modo},
+            onSelectionChanged: (s) => setState(() => _modo = s.first),
+          ),
           const SizedBox(height: CentinelaSpacing.lg),
           Text(
             'Para alertas hiperlocales necesitamos tu ubicación y '
