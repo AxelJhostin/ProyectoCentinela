@@ -8,7 +8,6 @@ import '../theme/centinela_spacing.dart';
 import '../theme/centinela_theme.dart';
 import '../widgets/centinela_logo.dart';
 import 'home_screen.dart';
-import 'legal_terms_screen.dart';
 
 /// Onboarding — permisos + guía contextual (Sprint 8).
 class OnboardingScreen extends StatefulWidget {
@@ -202,10 +201,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
                 ),
                 subtitle: TextButton(
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(builder: (_) => const LegalTermsScreen()),
-                  ),
-                  child: const Text('Leer términos completos'),
+                  onPressed: () async {
+                    final ok = await LegalService.openPrivacyPolicyInBrowser();
+                    if (!context.mounted) return;
+                    if (!ok) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('No se pudo abrir la política de privacidad'),
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text('Leer política de privacidad'),
                 ),
                 controlAffinity: ListTileControlAffinity.leading,
               ),

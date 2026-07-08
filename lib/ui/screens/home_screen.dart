@@ -26,7 +26,7 @@ import 'admin_screen.dart';
 import 'detalle_alerta_screen.dart';
 import 'emision_screen.dart';
 import 'historial_screen.dart';
-import 'legal_terms_screen.dart';
+import '../../services/legal_service.dart';
 import 'mi_alerta_screen.dart';
 
 /// Pantalla 1 — Mapa + panel inferior con alertas activas (Sprint 2).
@@ -321,12 +321,21 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           ),
                           IconButton(
                             icon: const Icon(Icons.gavel_outlined),
-                            tooltip: 'Términos y privacidad',
-                            onPressed: () => Navigator.of(context).push(
-                              MaterialPageRoute<void>(
-                                builder: (_) => const LegalTermsScreen(),
-                              ),
-                            ),
+                            tooltip: 'Política de privacidad',
+                            onPressed: () async {
+                              final ok =
+                                  await LegalService.openPrivacyPolicyInBrowser();
+                              if (!context.mounted) return;
+                              if (!ok) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'No se pudo abrir la política de privacidad',
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
                           ),
                         ],
                       ),

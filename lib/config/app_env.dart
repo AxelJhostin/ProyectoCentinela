@@ -34,4 +34,9 @@ class AppEnv {
   /// URL pública para preview WhatsApp (Edge Function alerta-preview).
   static String alertaPreviewUrl(String alertaId) =>
       '$supabaseUrl/functions/v1/alerta-preview?id=$alertaId';
+
+  /// Política de privacidad y términos (sitio Astro en Vercel).
+  static String get privacyPolicyUrl =>
+      dotenv.env['CENTINELA_PRIVACY_URL'] ??
+      'https://proyecto-centinela.vercel.app/privacidad';
 }

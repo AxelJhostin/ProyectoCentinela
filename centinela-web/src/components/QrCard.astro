@@ -1,0 +1,59 @@
+---
+import QRCode from 'qrcode';
+
+interface Props {
+  label: string;
+  hint: string;
+  url: string;
+}
+
+const { label, hint, url } = Astro.props;
+
+const qrDataUrl = await QRCode.toDataURL(url, {
+  margin: 1,
+  width: 200,
+  color: { dark: '#111827', light: '#ffffff' },
+});
+---
+
+<figure class="qr-card">
+  <img src={qrDataUrl} alt={`Código QR: ${label}`} width="200" height="200" loading="lazy" />
+  <figcaption>
+    <strong>{label}</strong>
+    <span>{hint}</span>
+  </figcaption>
+</figure>
+
+<style>
+  .qr-card {
+    margin: 0;
+    text-align: center;
+    padding: 1rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+
+  .qr-card img {
+    display: block;
+    margin: 0 auto;
+    border-radius: 8px;
+  }
+
+  .qr-card figcaption {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-top: 0.75rem;
+  }
+
+  .qr-card strong {
+    font-size: 0.95rem;
+  }
+
+  .qr-card span {
+    font-size: 0.82rem;
+    color: var(--color-text-secondary);
+    line-height: 1.4;
+  }
+</style>

@@ -1,0 +1,134 @@
+---
+import QrCard from './QrCard.astro';
+import { SITE_NAME, SITE_TAGLINE, SITE_URL } from '../consts/seo';
+
+const apkUrl = `${SITE_URL}/centinela.apk`;
+const shareText = encodeURIComponent(
+  `${SITE_NAME} — ${SITE_TAGLINE} Descarga la app: ${SITE_URL}`,
+);
+const whatsappUrl = `https://wa.me/?text=${shareText}`;
+---
+
+<section id="compartir" class="share-panel card" aria-labelledby="share-title">
+  <div class="share-intro">
+    <h2 id="share-title" class="section-title">Escanea o comparte</h2>
+    <p class="section-lead share-lead">
+      Muestra el QR a quien quiera instalar Centinela, o comparte esta página con tu
+      comunidad.
+    </p>
+  </div>
+
+  <div class="qr-grid">
+    <QrCard
+      label="Descargar APK"
+      hint="Escanea con la cámara de tu Android para instalar la app."
+      url={apkUrl}
+    />
+    <QrCard
+      label="Compartir esta página"
+      hint="Escanea para abrir el sitio y conocer Centinela."
+      url={SITE_URL}
+    />
+  </div>
+
+  <div class="share-actions">
+    <button type="button" class="btn btn-primary btn-full-mobile" id="native-share-btn">
+      Compartir enlace
+    </button>
+    <a
+      class="btn btn-whatsapp btn-full-mobile"
+      href={whatsappUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Compartir por WhatsApp
+    </a>
+    <button type="button" class="btn btn-outline btn-full-mobile" id="copy-link-btn">
+      Copiar enlace
+    </button>
+  </div>
+  <p class="share-feedback" id="share-feedback" role="status" aria-live="polite"></p>
+</section>
+
+<script>
+  const shareData = {
+    title: 'Centinela — Alertas de tu comunidad',
+    text: 'App comunitaria para alertas de personas desaparecidas en Ecuador. Descarga el APK gratis.',
+    url: window.location.origin + window.location.pathname,
+  };
+
+  const feedback = document.getElementById('share-feedback');
+  const showFeedback = (msg: string) => {
+    if (feedback) feedback.textContent = msg;
+  };
+
+  document.getElementById('native-share-btn')?.addEventListener('click', async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        showFeedback('¡Gracias por compartir!');
+      } else {
+        await navigator.clipboard.writeText(shareData.url);
+        showFeedback('Enlace copiado al portapapeles');
+      }
+    } catch (err) {
+      if ((err as Error).name !== 'AbortError') {
+        showFeedback('No se pudo compartir. Usa copiar enlace.');
+      }
+    }
+  });
+
+  document.getElementById('copy-link-btn')?.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(shareData.url);
+      showFeedback('Enlace copiado — pégalo en WhatsApp o redes');
+    } catch {
+      showFeedback('Copia manual: ' + shareData.url);
+    }
+  });
+</script>
+
+<style>
+  .share-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    background: linear-gradient(160deg, #fff 0%, #f0f7ff 100%);
+  }
+
+  .share-lead {
+    margin-bottom: 0;
+  }
+
+  .qr-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 480px) {
+    .qr-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .share-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+  }
+
+  .btn-whatsapp {
+    background: var(--color-whatsapp);
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(37, 211, 102, 0.3);
+  }
+
+  .share-feedback {
+    min-height: 1.25rem;
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--color-community);
+    font-weight: 600;
+  }
+</style>

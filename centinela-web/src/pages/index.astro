@@ -2,6 +2,8 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import SharePanel from '../components/SharePanel.astro';
+import MobileDownloadBar from '../components/MobileDownloadBar.astro';
 import {
   DEFAULT_DESCRIPTION,
   DEFAULT_KEYWORDS,
@@ -112,8 +114,8 @@ const jsonLd = [
             avistamientos sin exponer datos sensibles.
           </p>
           <div class="hero-actions">
-            <a class="btn btn-primary" href="#descargar">Descargar APK gratis</a>
-            <a class="btn btn-outline" href="#como-funciona">Ver cómo funciona</a>
+            <a class="btn btn-primary btn-full-mobile" href="#descargar">Descargar APK gratis</a>
+            <a class="btn btn-outline btn-full-mobile" href="#compartir">QR y compartir</a>
           </div>
           <p class="hero-note">
             Versión piloto para Android. Play Store próximamente.
@@ -220,12 +222,16 @@ const jsonLd = [
           </ol>
         </div>
         <div class="download-cta">
-          <a class="btn btn-alert" href="/centinela.apk" download>
+          <a class="btn btn-alert btn-full-mobile" href="/centinela.apk" download>
             Descargar centinela.apk
           </a>
           <p class="apk-meta">Versión piloto 0.1.0 · Android 8+</p>
           <a class="privacy-link" href="/privacidad">Leer política de privacidad</a>
         </div>
+      </div>
+
+      <div class="container share-wrap">
+        <SharePanel />
       </div>
     </section>
 
@@ -257,11 +263,18 @@ const jsonLd = [
   </main>
 
   <Footer />
+  <MobileDownloadBar />
 </BaseLayout>
 
 <style>
   .hero {
-    padding-top: 3rem;
+    padding-top: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .hero {
+      padding-top: 3rem;
+    }
   }
 
   .hero-grid {
@@ -291,9 +304,16 @@ const jsonLd = [
 
   .hero-actions {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    margin: 1.5rem 0 1rem;
+    flex-direction: column;
+    gap: 0.65rem;
+    margin: 1.25rem 0 1rem;
+  }
+
+  @media (min-width: 480px) {
+    .hero-actions {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
   }
 
   .hero-note {
@@ -384,8 +404,18 @@ const jsonLd = [
   .download-cta {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     gap: 0.75rem;
+  }
+
+  .share-wrap {
+    margin-top: 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .download-cta {
+      align-items: flex-start;
+    }
   }
 
   .apk-meta,
