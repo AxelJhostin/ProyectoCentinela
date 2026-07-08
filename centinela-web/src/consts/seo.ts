@@ -10,7 +10,7 @@ export const DEFAULT_KEYWORDS = [
   'personas desaparecidas',
   'app seguridad Ecuador',
   'alertas hiperlocales',
-  'comunidad Jipijapa',
+  'comunidad Manabí',
   'Manabí',
   'desaparición',
   'avistamientos',
@@ -23,6 +23,6 @@ export const DEFAULT_KEYWORDS = [
 ];
 
 export const DEFAULT_DESCRIPTION =
-  'Centinela es la app comunitaria para reportar desapariciones en Ecuador. Alertas push en tu zona, avistamientos seguros y difusión por WhatsApp. Descarga el APK gratis. Piloto en Jipijapa.';
+  'Centinela es la app comunitaria para reportar desapariciones en Ecuador. Alertas push en tu zona, avistamientos seguros y difusión por WhatsApp. Descarga el APK gratis. Piloto en Manabí.';
 
 export const TWITTER_HANDLE = '@AxelJhostin';

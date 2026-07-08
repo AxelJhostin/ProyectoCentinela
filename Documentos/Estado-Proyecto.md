@@ -1,6 +1,6 @@
 # Estado del proyecto — Centinela
 
-Última actualización: junio 2026 · MVP funcional en piloto Jipijapa.
+Última actualización: junio 2026 · MVP funcional en piloto Manabí.
 
 ---
 
@@ -62,7 +62,7 @@ Instalar en Android: copiar el APK o `adb install -r build/app/outputs/flutter-a
 ## Siguiente fase
 
 1. Difusión comunitaria con URL pública del sitio  
-2. Play Store (testing cerrado Jipijapa)  
+2. Play Store (testing cerrado Manabí)  
 3. Registrar sitio en Google Search Console  
 
 ---

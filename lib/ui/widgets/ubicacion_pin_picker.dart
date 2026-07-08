@@ -132,7 +132,7 @@ class _UbicacionPinPickerState extends State<UbicacionPinPicker> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              'No encontramos ese lugar. Prueba "centro de Jipijapa" o mueve el pin.',
+              'No encontramos ese lugar. Prueba "centro de Portoviejo" o mueve el pin.',
             ),
           ),
         );
@@ -218,7 +218,7 @@ class _UbicacionPinPickerState extends State<UbicacionPinPicker> {
             onSubmitted: (_) => _buscarLugar(),
             decoration: InputDecoration(
               labelText: 'Buscar lugar en mapa',
-              hintText: 'Ej: centro de Jipijapa, universidad, parque central',
+              hintText: 'Ej: centro de Portoviejo, universidad, parque central',
               suffixIcon: _searching
                   ? const Padding(
                       padding: EdgeInsets.all(12),

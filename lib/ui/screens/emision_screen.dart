@@ -309,7 +309,7 @@ class _EmisionScreenState extends State<EmisionScreen> {
             ),
             const SizedBox(height: CentinelaSpacing.sm),
             Text(
-              'Jipijapa urbano: 10 km. Rural o carretera: 30 km. '
+              'Manabí urbano: 10 km. Rural o carretera: 30 km. '
               'Provincia (máx. app): 50 km. Para más alcance, usa WhatsApp.',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: CentinelaColors.textSecondary,

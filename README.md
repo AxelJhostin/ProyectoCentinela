@@ -8,7 +8,7 @@ Plataforma móvil de **alertas comunitarias hiperlocales** para reportes de pers
 
 ## Estado
 
-MVP **funcional** en piloto Jipijapa (Android): emitir alerta, push en radio, Lo vi, WhatsApp, resolver caso.
+MVP **funcional** en piloto Manabí (Android): emitir alerta, push en radio, Lo vi, WhatsApp, resolver caso.
 
 **Sitio web:** https://proyecto-centinela.vercel.app (landing + privacidad + APK)
 

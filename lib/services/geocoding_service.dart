@@ -20,7 +20,7 @@ class GeocodingService {
 
   static const _userAgent = 'CentinelaMVP/0.1 (com.axeljhostin.centinela.centinela)';
 
-  /// Jipijapa — prioriza resultados en la zona piloto.
+  /// Centro del piloto en Manabí (coordenadas de referencia para geocoding).
   static const LatLng jipijapaCenter = LatLng(-1.34885, -80.57934);
 
   static Future<List<GeocodingPlace>> search(

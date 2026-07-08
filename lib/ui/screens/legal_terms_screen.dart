@@ -73,7 +73,7 @@ class LegalTermsScreen extends StatelessWidget {
               border: Border.all(color: CentinelaColors.community.withValues(alpha: 0.4)),
             ),
             child: Text(
-              'Versión piloto · Jipijapa 2025. Política completa en '
+              'Versión piloto · Manabí 2025. Política completa en '
               'proyecto-centinela.vercel.app/privacidad. Este texto será revisado por '
               'asesoría legal antes del despliegue público.',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
