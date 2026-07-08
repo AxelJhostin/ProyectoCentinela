@@ -18,6 +18,7 @@ class AlertaDesaparecido {
     required this.radioKm,
     required this.creadoEn,
     this.ultimaVistaTexto = '',
+    this.estado = 'ACTIVA',
   });
 
   final String id;
@@ -33,10 +34,14 @@ class AlertaDesaparecido {
   final String fotoUrl;
   final int radioKm;
   final DateTime creadoEn;
+  final String estado;
 
   String get distanciaTexto => DistanciaFormato.desdeUsuario(distanciaKm);
 
   String get tiempoTexto {
+    if (estado != 'ACTIVA') {
+      return estado == 'RESUELTA' ? 'Caso resuelto' : 'Alerta cerrada';
+    }
     if (minutosReportada < 1) return 'Alerta activa · Hace un momento';
     if (minutosReportada == 1) return 'Alerta activa · Hace 1 min';
     return 'Alerta activa · Hace $minutosReportada min';
@@ -52,8 +57,8 @@ class AlertaDesaparecido {
     final creado = DateTime.parse(map['creado_en'] as String).toLocal();
     final minutos = DateTime.now().difference(creado).inMinutes;
 
-    var distancia = 0.0;
-    if (userLat != null && userLng != null) {
+    var distancia = (map['distancia_km'] as num?)?.toDouble() ?? 0.0;
+    if (distancia == 0 && userLat != null && userLng != null) {
       distancia = const Distance().as(
         LengthUnit.Kilometer,
         LatLng(userLat, userLng),
@@ -75,6 +80,7 @@ class AlertaDesaparecido {
       fotoUrl: map['foto_url'] as String,
       radioKm: map['radio_km'] as int,
       creadoEn: creado,
+      estado: (map['estado'] as String?) ?? 'ACTIVA',
     );
   }
 }

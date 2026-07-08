@@ -60,11 +60,18 @@ class _EmisionScreenState extends State<EmisionScreen> {
   }
 
   Future<void> _elegirFoto(ImageSource source) async {
-    final bytes = source == ImageSource.camera
-        ? await FotoService.pickFromCamera()
-        : await FotoService.pickFromGallery();
-    if (bytes != null && mounted) {
-      setState(() => _fotoBytes = bytes);
+    try {
+      final bytes = source == ImageSource.camera
+          ? await FotoService.pickFromCamera()
+          : await FotoService.pickFromGallery();
+      if (bytes != null && mounted) {
+        setState(() => _fotoBytes = bytes);
+      }
+    } on FotoValidationException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message)),
+      );
     }
   }
 

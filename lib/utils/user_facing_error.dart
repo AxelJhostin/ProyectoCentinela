@@ -6,6 +6,8 @@ String userFacingError(Object error) {
     'Cuentas nuevas: máximo': 'Tu cuenta es nueva: puedes publicar hasta 3 alertas en 24 horas. Si ya llegaste al límite, espera un poco.',
     'Ya tienes una alerta activa': 'Ya tienes una alerta activa. Resuélvela o ciérrala antes de emitir otra.',
     'restricciones por reportes': 'Tu cuenta tiene restricciones por reportes previos.',
+    'Espera 15 minutos': 'Espera 15 minutos después de resolver una alerta antes de emitir otra.',
+    'muchos avistamientos': 'Has reportado muchos avistamientos. Espera un momento e intenta de nuevo.',
     'Perfil de usuario no encontrado': 'No encontramos tu perfil. Cierra la app, vuelve a iniciar sesión e intenta otra vez.',
   };
 

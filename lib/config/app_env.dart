@@ -1,10 +1,15 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-/// Variables de entorno cargadas desde `.env.local` (no se sube a GitHub).
+/// Variables de entorno cargadas desde `env/app.env` (no se sube a GitHub).
 class AppEnv {
   static Future<void> load() async {
     await dotenv.load(fileName: 'env/app.env');
   }
+
+  static String get environment =>
+      dotenv.env['CENTINELA_ENV'] ?? 'production';
+
+  static bool get isStaging => environment == 'staging';
 
   static String get supabaseUrl {
     final value = dotenv.env['CENTINELA_SUPABASE_URL'];

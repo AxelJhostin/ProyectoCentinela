@@ -2,6 +2,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../config/app_env.dart';
 import '../models/alerta_desaparecido.dart';
+import 'compartir_service.dart';
 import 'deep_link_service.dart';
 
 /// Compartir alerta por WhatsApp con enlace de preview Open Graph.
@@ -37,7 +38,10 @@ ${DeepLinkService.alertaDeepLink(alerta.id)}''';
     for (final uri in uris) {
       try {
         final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
-        if (launched) return true;
+        if (launched) {
+          await CompartirService.registrarYNotificar(alerta.id);
+          return true;
+        }
       } catch (_) {
         continue;
       }

@@ -1,6 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { sendFcm } from "../_shared/fcm.ts";
+import { registrarLog } from "../_shared/logging.ts";
 
 interface Body {
   alerta_id: string;
@@ -71,6 +72,10 @@ Deno.serve(async (req: Request) => {
     `${detalle} ${alerta.nombre_persona}.`,
     { alerta_id, tipo: "avistamiento" },
   );
+
+  await registrarLog("info", "dispatch-avistamiento-push", ok ? "enviado" : "fallo", {
+    alerta_id,
+  });
 
   return json({ ok, sent: ok ? 1 : 0 });
 });

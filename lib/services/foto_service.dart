@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../utils/foto_validacion.dart';
 import 'supabase_service.dart';
 
 /// Selección, compresión y subida de fotos a Supabase Storage.
@@ -25,7 +27,27 @@ class FotoService {
     if (file == null) return null;
 
     final bytes = await file.readAsBytes();
+    final errorTamano = FotoValidacion.validarTamanoBytes(bytes.length);
+    if (errorTamano != null) throw FotoValidationException(errorTamano);
+
+    final dimensiones = await _leerDimensiones(bytes);
+    final errorDims = FotoValidacion.validarDimensiones(
+      ancho: dimensiones.$1,
+      alto: dimensiones.$2,
+    );
+    if (errorDims != null) throw FotoValidationException(errorDims);
+
     return _compressForUpload(bytes);
+  }
+
+  static Future<(int, int)> _leerDimensiones(Uint8List bytes) async {
+    final codec = await ui.instantiateImageCodec(bytes);
+    final frame = await codec.getNextFrame();
+    final image = frame.image;
+    final w = image.width;
+    final h = image.height;
+    image.dispose();
+    return (w, h);
   }
 
   /// Objetivo WhatsApp OG: imagen < 300 KB (Sprint 4).
@@ -90,4 +112,12 @@ class FotoService {
         .from('centinela-fotos')
         .getPublicUrl(path);
   }
+}
+
+class FotoValidationException implements Exception {
+  FotoValidationException(this.message);
+  final String message;
+
+  @override
+  String toString() => message;
 }

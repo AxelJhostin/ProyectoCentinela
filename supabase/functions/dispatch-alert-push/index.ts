@@ -1,6 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { sendFcm } from "../_shared/fcm.ts";
+import { registrarLog } from "../_shared/logging.ts";
 
 interface DispatchBody {
   alerta_id: string;
@@ -48,6 +49,10 @@ Deno.serve(async (req: Request) => {
   });
 
   if (error) {
+    await registrarLog("error", "dispatch-alert-push", "usuarios_en_radio", {
+      alerta_id: body.alerta_id,
+      error: error.message,
+    });
     return json({ ok: false, error: error.message }, 500);
   }
 
@@ -71,6 +76,12 @@ Deno.serve(async (req: Request) => {
     );
     if (ok) sent += 1;
   }
+
+  await registrarLog("info", "dispatch-alert-push", "completado", {
+    alerta_id: body.alerta_id,
+    sent,
+    total: usuarios?.length ?? 0,
+  });
 
   return json({ ok: true, sent, total: usuarios?.length ?? 0 });
 });

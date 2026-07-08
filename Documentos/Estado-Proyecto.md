@@ -12,6 +12,7 @@
 | Supabase + PostGIS + FCM | ✅ Producción piloto |
 | Piloto Alfa/Beta | ✅ Push, Lo vi, WhatsApp, mapa |
 | Identidad visual (logo, icono, splash) | ✅ Sprint 7 |
+| Sprints 8–10 (UX, backend, admin) | ✅ Código listo — aplicar migraciones en Supabase |
 | Play Store | ⬜ Siguiente |
 
 ---
@@ -26,6 +27,9 @@
 | 5 | Fixes Alfa, FCM, avistamientos enriquecidos |
 | 6 | Radio 10/30/50 km, feedback emisor, push resuelto, Google Maps en avistamientos |
 | 7 | Logo, icono adaptive, splash, onboarding, guía de marca |
+| 8 | Mi alerta activa, filtros, validación foto, onboarding contextual |
+| 9 | Logs, rate limits, historial, offline, staging |
+| 10 | Compartidos + push, panel admin, retención 90 días |
 
 Detalle: [sprints/](sprints/) · Marca: [Guia-Marca-Centinela.md](guias/Guia-Marca-Centinela.md)
 

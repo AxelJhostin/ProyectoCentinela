@@ -2,6 +2,7 @@ import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 
 import '../ui/screens/detalle_alerta_screen.dart';
+import '../utils/deep_link_parser.dart';
 import 'alerta_service.dart';
 
 /// Deep links `centinela://alerta?id=<uuid>` (Sprint 3).
@@ -28,7 +29,7 @@ class DeepLinkService {
       'centinela://alerta?id=$alertaId';
 
   static Future<void> _handleUri(Uri uri) async {
-    final alertaId = _extractAlertaId(uri);
+    final alertaId = parseAlertaIdFromUri(uri);
     if (alertaId == null) return;
 
     final alerta = await AlertaService.fetchById(alertaId);
@@ -44,16 +45,4 @@ class DeepLinkService {
     );
   }
 
-  static String? _extractAlertaId(Uri uri) {
-    if (uri.scheme != 'centinela') return null;
-    if (uri.host != 'alerta') return null;
-
-    final fromQuery = uri.queryParameters['id'];
-    if (fromQuery != null && fromQuery.isNotEmpty) return fromQuery;
-
-    if (uri.pathSegments.isNotEmpty && uri.pathSegments.first.isNotEmpty) {
-      return uri.pathSegments.first;
-    }
-    return null;
-  }
 }

@@ -5,11 +5,15 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../models/alerta_desaparecido.dart';
+import '../../services/admin_service.dart';
+import '../../services/alerta_filtros_service.dart';
 import '../../services/alerta_service.dart';
 import '../../services/avistamiento_service.dart';
+import '../../services/home_tips_service.dart';
 import '../../services/location_service.dart';
 import '../../services/share_service.dart';
 import '../../services/witness_guide_service.dart';
+import '../../utils/alerta_filtros.dart';
 import '../theme/centinela_spacing.dart';
 import '../theme/centinela_theme.dart';
 import '../widgets/alerta_card.dart';
@@ -18,9 +22,12 @@ import '../widgets/centinela_empty_state.dart';
 import '../widgets/centinela_logo.dart';
 import '../widgets/centinela_map_marker.dart';
 import '../widgets/emitir_alerta_fab.dart';
+import 'admin_screen.dart';
 import 'detalle_alerta_screen.dart';
 import 'emision_screen.dart';
+import 'historial_screen.dart';
 import 'legal_terms_screen.dart';
+import 'mi_alerta_screen.dart';
 
 /// Pantalla 1 — Mapa + panel inferior con alertas activas (Sprint 2).
 class HomeScreen extends StatefulWidget {
@@ -34,8 +41,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   final _mapController = MapController();
   LatLng? _userPosition;
   List<AlertaDesaparecido> _alertas = [];
+  List<AlertaDesaparecido> _alertasFiltradas = [];
   String? _error;
   bool _loading = true;
+  bool _tieneAlertaActiva = false;
+  FiltroDistanciaKm _filtroDistancia = FiltroDistanciaKm.sinLimite;
+  FiltroAntiguedad _filtroAntiguedad = FiltroAntiguedad.todas;
   StreamSubscription<List<AlertaDesaparecido>>? _alertasSub;
   StreamSubscription<int>? _avistamientosSub;
   Timer? _ubicacionTimer;
@@ -46,6 +57,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _cargarFiltros();
     _initLocation();
     _ubicacionTimer = Timer.periodic(
       const Duration(minutes: 3),
@@ -67,6 +79,66 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     _avistamientosSub?.cancel();
     _ubicacionTimer?.cancel();
     super.dispose();
+  }
+
+  Future<void> _cargarFiltros() async {
+    _filtroDistancia = await AlertaFiltrosService.getDistancia();
+    _filtroAntiguedad = await AlertaFiltrosService.getAntiguedad();
+    _aplicarFiltros();
+  }
+
+  void _aplicarFiltros() {
+    _alertasFiltradas = aplicarFiltrosAlertas(
+      _alertas,
+      distancia: _filtroDistancia,
+      antiguedad: _filtroAntiguedad,
+    );
+  }
+
+  Future<void> _cambiarFiltros({
+    FiltroDistanciaKm? distancia,
+    FiltroAntiguedad? antiguedad,
+  }) async {
+    if (distancia != null) _filtroDistancia = distancia;
+    if (antiguedad != null) _filtroAntiguedad = antiguedad;
+    await AlertaFiltrosService.save(
+      distancia: _filtroDistancia,
+      antiguedad: _filtroAntiguedad,
+    );
+    if (mounted) setState(_aplicarFiltros);
+  }
+
+  Future<void> _checkAlertaActiva() async {
+    final id = await AlertaService.miAlertaActivaId();
+    if (mounted) setState(() => _tieneAlertaActiva = id != null);
+  }
+
+  Future<void> _abrirHistorial() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const HistorialScreen()),
+    );
+  }
+
+  Future<void> _abrirAdminSiPermitido() async {
+    if (!await AdminService.esAdmin()) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Acceso admin no autorizado')),
+      );
+      return;
+    }
+    if (!mounted) return;
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const AdminScreen()),
+    );
+  }
+
+  Future<void> _abrirMiAlerta() async {
+    final resuelto = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(builder: (_) => const MiAlertaScreen()),
+    );
+    if (resuelto == true) await _initLocation();
+    await _checkAlertaActiva();
   }
 
   Future<void> _initLocation() async {
@@ -94,6 +166,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       setState(() {
         _userPosition = centro;
         _alertas = alertas;
+        _aplicarFiltros();
         _loading = false;
       });
 
@@ -102,8 +175,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       });
 
       _subscribeRealtime(centro);
+      await _checkAlertaActiva();
       await _watchMisAvistamientos();
       if (mounted) await WitnessGuideService.showIfNeeded(context);
+      if (mounted) await HomeTipsService.showIfNeeded(context);
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -120,7 +195,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       userLng: centro.longitude,
     ).listen(
       (alertas) {
-        if (mounted) setState(() => _alertas = alertas);
+        if (mounted) {
+          setState(() {
+            _alertas = alertas;
+            _aplicarFiltros();
+          });
+        }
       },
       onError: (Object e) {
         if (mounted) setState(() => _error = e.toString());
@@ -161,6 +241,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       MaterialPageRoute<void>(builder: (_) => const EmisionScreen()),
     );
     await _initLocation();
+    await _checkAlertaActiva();
   }
 
   @override
@@ -194,7 +275,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             'com.axeljhostin.centinela.centinela',
                       ),
                       MarkerLayer(
-                        markers: _alertas.map(_markerForAlerta).toList(),
+                        markers: _alertasFiltradas.map(_markerForAlerta).toList(),
                       ),
                       IgnorePointer(
                         child: MarkerLayer(
@@ -220,11 +301,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: AppBar(
-                        title: CentinelaLogo.compact(),
+                        title: GestureDetector(
+                          onLongPress: _abrirAdminSiPermitido,
+                          child: CentinelaLogo.compact(),
+                        ),
                         backgroundColor:
                             CentinelaColors.surface.withValues(alpha: 0.95),
                         surfaceTintColor: Colors.transparent,
                         actions: [
+                          IconButton(
+                            icon: const Icon(Icons.history),
+                            tooltip: 'Historial',
+                            onPressed: _abrirHistorial,
+                          ),
                           IconButton(
                             icon: const Icon(Icons.refresh),
                             tooltip: 'Actualizar',
@@ -244,6 +333,40 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     ),
                   ),
                 ),
+                if (_tieneAlertaActiva)
+                  Positioned(
+                    left: 16,
+                    right: 16,
+                    bottom: 88,
+                    child: Material(
+                      color: CentinelaColors.alertCritical,
+                      borderRadius: BorderRadius.circular(CentinelaSpacing.radiusMd),
+                      elevation: 4,
+                      child: InkWell(
+                        onTap: _abrirMiAlerta,
+                        borderRadius: BorderRadius.circular(CentinelaSpacing.radiusMd),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.campaign_outlined, color: Colors.white),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  'Tienes una alerta activa — ver estado',
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              const Icon(Icons.chevron_right, color: Colors.white70),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 Positioned(
                   right: 16,
                   bottom: 16,
@@ -316,6 +439,20 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     return Column(
       children: [
+        if (AlertaService.usandoCache)
+          Container(
+            width: double.infinity,
+            color: CentinelaColors.community.withValues(alpha: 0.12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Text(
+              _offlineBannerText(),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: CentinelaColors.community,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
         const SizedBox(height: 10),
         Container(
           width: 40,
@@ -337,26 +474,70 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               ),
               const Spacer(),
               CentinelaChip(
-                label: '${_alertas.length} cerca',
+                label: '${_alertasFiltradas.length} cerca',
                 icon: Icons.radar,
               ),
             ],
           ),
         ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+          child: Row(
+            children: [
+              Expanded(
+                child: DropdownButtonFormField<FiltroDistanciaKm>(
+                  initialValue: _filtroDistancia,
+                  decoration: const InputDecoration(
+                    labelText: 'Distancia',
+                    isDense: true,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  ),
+                  items: FiltroDistanciaKm.values
+                      .map((f) => DropdownMenuItem(value: f, child: Text(f.etiqueta)))
+                      .toList(),
+                  onChanged: (v) {
+                    if (v != null) _cambiarFiltros(distancia: v);
+                  },
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: DropdownButtonFormField<FiltroAntiguedad>(
+                  initialValue: _filtroAntiguedad,
+                  decoration: const InputDecoration(
+                    labelText: 'Antigüedad',
+                    isDense: true,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  ),
+                  items: FiltroAntiguedad.values
+                      .map((f) => DropdownMenuItem(value: f, child: Text(f.etiqueta)))
+                      .toList(),
+                  onChanged: (v) {
+                    if (v != null) _cambiarFiltros(antiguedad: v);
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
         Expanded(
-          child: _alertas.isEmpty
-              ? const CentinelaEmptyState(
-                  title: 'Tu zona está tranquila por ahora',
-                  subtitle: 'No hay alertas activas cerca de ti. '
-                      'Si necesitas ayuda, usa el botón rojo del mapa.',
+          child: _alertasFiltradas.isEmpty
+              ? CentinelaEmptyState(
+                  title: _alertas.isEmpty
+                      ? 'Tu zona está tranquila por ahora'
+                      : 'Ninguna alerta con estos filtros',
+                  subtitle: _alertas.isEmpty
+                      ? 'No hay alertas activas cerca de ti. '
+                          'Si necesitas ayuda, usa el botón rojo del mapa.'
+                      : 'Prueba ampliar distancia o antigüedad.',
                   icon: Icons.shield_outlined,
                 )
               : ListView.separated(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                  itemCount: _alertas.length,
+                  itemCount: _alertasFiltradas.length,
                   separatorBuilder: (_, _) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
-                    final alerta = _alertas[index];
+                    final alerta = _alertasFiltradas[index];
                     return AlertaCard(
                       alerta: alerta,
                       onTap: () => _openDetalle(alerta),
@@ -367,6 +548,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         ),
       ],
     );
+  }
+
+  String _offlineBannerText() {
+    final ts = AlertaService.cacheGuardadoEn;
+    if (ts == null) return 'Sin conexión — mostrando datos guardados';
+    final min = DateTime.now().difference(ts).inMinutes;
+    if (min < 1) return 'Sin conexión — datos de hace un momento';
+    return 'Sin conexión — datos de hace $min min';
   }
 
   Marker _markerForAlerta(AlertaDesaparecido alerta) {

@@ -6,6 +6,7 @@ import 'package:latlong2/latlong.dart';
 import '../../models/alerta_desaparecido.dart';
 import '../../services/alerta_service.dart';
 import '../../services/avistamiento_service.dart';
+import '../../services/cache_service.dart';
 import '../../services/geocoding_service.dart';
 import '../../services/moderacion_service.dart';
 import '../../services/push_service.dart';
@@ -37,6 +38,7 @@ class _DetalleAlertaScreenState extends State<DetalleAlertaScreen> {
   @override
   void initState() {
     super.initState();
+    CacheService.guardarDetalle(widget.alerta);
     _checkEmisor();
   }
 

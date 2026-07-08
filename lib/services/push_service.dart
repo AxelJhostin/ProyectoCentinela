@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../models/push_dispatch_result.dart';
+import 'log_service.dart';
 import 'supabase_service.dart';
 
 /// Invoca Edge Functions FCM (Sprint 5.2+).
@@ -31,9 +32,23 @@ class PushService {
       );
       final result = PushDispatchResult.fromResponse(res.data);
       debugPrint('Push comunidad: ${res.data}');
+      if (!result.ok) {
+        await LogService.registrar(
+          nivel: 'warn',
+          origen: 'push_service',
+          evento: 'dispatch_alert_fallo',
+          payload: {'alerta_id': alertaId, 'message': result.message},
+        );
+      }
       return result;
     } catch (e) {
       debugPrint('Push comunidad no enviado: $e');
+      await LogService.registrar(
+        nivel: 'error',
+        origen: 'push_service',
+        evento: 'dispatch_alert_error',
+        payload: {'alerta_id': alertaId, 'error': e.toString()},
+      );
       return PushDispatchResult(
         ok: false,
         sent: 0,

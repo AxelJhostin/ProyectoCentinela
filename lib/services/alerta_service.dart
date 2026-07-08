@@ -3,14 +3,21 @@ import 'dart:async';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/alerta_desaparecido.dart';
+import 'cache_service.dart';
 import 'location_service.dart';
 import 'supabase_service.dart';
 
-/// CRUD de alertas contra Supabase (Sprint 2).
+/// CRUD de alertas contra Supabase (Sprint 2+).
 class AlertaService {
   AlertaService._();
 
   static SupabaseClient get _client => SupabaseService.client;
+
+  static bool _usandoCache = false;
+  static DateTime? _cacheGuardadoEn;
+
+  static bool get usandoCache => _usandoCache;
+  static DateTime? get cacheGuardadoEn => _cacheGuardadoEn;
 
   static Future<String?> get currentUsuarioId async {
     final authId = _client.auth.currentUser?.id;
@@ -27,19 +34,68 @@ class AlertaService {
     double? userLat,
     double? userLng,
   }) async {
-    final pos = await LocationService.getCurrentPosition();
-    if (pos != null) {
-      userLat = pos.latitude;
-      userLng = pos.longitude;
-    }
+    _usandoCache = false;
+    _cacheGuardadoEn = null;
 
-    final rows = await _client.from('v_alertas_activas').select();
-    final list = (rows as List).cast<Map<String, dynamic>>();
-    final alertas = list
-        .map((r) => AlertaDesaparecido.fromMap(r, userLat: userLat, userLng: userLng))
+    try {
+      final pos = await LocationService.getCurrentPosition();
+      if (pos != null) {
+        userLat = pos.latitude;
+        userLng = pos.longitude;
+      }
+
+      final rows = await _client.from('v_alertas_activas').select();
+      final list = (rows as List).cast<Map<String, dynamic>>();
+      final alertas = list
+          .map((r) => AlertaDesaparecido.fromMap(r, userLat: userLat, userLng: userLng))
+          .toList();
+      alertas.sort((a, b) => a.distanciaKm.compareTo(b.distanciaKm));
+
+      await CacheService.guardarAlertasActivas(alertas);
+      return alertas;
+    } catch (_) {
+      final cache = await CacheService.leerAlertasActivas();
+      if (cache != null && cache.alertas.isNotEmpty) {
+        _usandoCache = true;
+        _cacheGuardadoEn = cache.guardadoEn;
+        return cache.alertas;
+      }
+      rethrow;
+    }
+  }
+
+  static Future<List<AlertaDesaparecido>> fetchHistorialCercano({
+    required double lat,
+    required double lng,
+    int radioKm = 50,
+  }) async {
+    final json = await _client.rpc<dynamic>(
+      'listar_historial_cercano',
+      params: {'p_lat': lat, 'p_lng': lng, 'p_radio_km': radioKm},
+    );
+    if (json == null) return [];
+    return _parseAlertaList(json, userLat: lat, userLng: lng);
+  }
+
+  static Future<List<AlertaDesaparecido>> fetchMiHistorial() async {
+    final json = await _client.rpc<dynamic>('listar_mi_historial');
+    if (json == null) return [];
+    return _parseAlertaList(json);
+  }
+
+  static List<AlertaDesaparecido> _parseAlertaList(
+    dynamic json, {
+    double? userLat,
+    double? userLng,
+  }) {
+    final list = json as List;
+    return list
+        .map((e) => AlertaDesaparecido.fromMap(
+              Map<String, dynamic>.from(e as Map),
+              userLat: userLat,
+              userLng: userLng,
+            ))
         .toList();
-    alertas.sort((a, b) => a.distanciaKm.compareTo(b.distanciaKm));
-    return alertas;
   }
 
   /// Realtime: emite lista actualizada cuando cambia alertas_desaparecidos.
@@ -107,7 +163,6 @@ class AlertaService {
     await _client.rpc<void>('resolver_alerta', params: {'p_alerta_id': alertaId});
   }
 
-  /// Id de la alerta activa emitida por el usuario actual (si existe).
   static Future<String?> miAlertaActivaId() async {
     final miId = await currentUsuarioId;
     if (miId == null) return null;
@@ -120,7 +175,6 @@ class AlertaService {
     return row?['id'] as String?;
   }
 
-  /// Una alerta por id (activa o resuelta) para deep links.
   static Future<AlertaDesaparecido?> fetchById(
     String alertaId, {
     double? userLat,
@@ -133,8 +187,12 @@ class AlertaService {
       );
       if (json == null) return null;
       final map = Map<String, dynamic>.from(json as Map);
-      return AlertaDesaparecido.fromMap(map, userLat: userLat, userLng: userLng);
+      final alerta = AlertaDesaparecido.fromMap(map, userLat: userLat, userLng: userLng);
+      await CacheService.guardarDetalle(alerta);
+      return alerta;
     } catch (_) {
+      final cached = await CacheService.leerDetalle();
+      if (cached != null && cached.id == alertaId) return cached;
       return null;
     }
   }

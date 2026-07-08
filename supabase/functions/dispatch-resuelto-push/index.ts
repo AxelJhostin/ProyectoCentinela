@@ -1,6 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { sendFcm } from "../_shared/fcm.ts";
+import { registrarLog } from "../_shared/logging.ts";
 
 interface Body {
   alerta_id: string;
@@ -84,6 +85,12 @@ Deno.serve(async (req: Request) => {
     );
     if (ok) sent += 1;
   }
+
+  await registrarLog("info", "dispatch-resuelto-push", "completado", {
+    alerta_id: body.alerta_id,
+    sent,
+    total: tokens.size,
+  });
 
   return json({ ok: true, sent, total: tokens.size });
 });
